@@ -119,7 +119,7 @@ function renderTrio() {
     const imgSrc   = c && c.img ? safeImg(c.img) : null;
     const imgHtml  = imgSrc
       ? `<img class="char-img" src="${imgSrc}" alt="${name}"
-              onerror="this.outerHTML='<div class=\\"char-img-fallback\\">${fallback}</div>'">`
+              onerror="this.outerHTML='<div class=&quot;char-img-fallback&quot;>${fallback}</div>'">`
       : `<div class="char-img-fallback">${fallback}</div>`;
     const anime = c ? c.anime : '';
     return `
@@ -242,7 +242,7 @@ function placeCharacter(name, zone) {
   const imgSrc    = c && c.img ? safeImg(c.img) : null;
   const imgHtml   = imgSrc
     ? `<img src="${imgSrc}" alt="${name}"
-            onerror="this.outerHTML='<div class=\\"placed-fallback\\">${fallback}</div>'">`
+            onerror="this.outerHTML='<div class=&quot;placed-fallback&quot;>${fallback}</div>'">`
     : `<div class="placed-fallback">${fallback}</div>`;
 
   zone.classList.add('filled');
@@ -313,7 +313,7 @@ function showSummary() {
       const imgSrc   = item.img ? safeImg(item.img) : null;
       const imgHtml  = imgSrc
         ? `<img src="${imgSrc}" alt="${item.name}"
-                onerror="this.outerHTML='<div class=\\"summary-card-fallback\\">${fallback}</div>'">`
+                onerror="this.outerHTML='<div class=&quot;summary-card-fallback&quot;>${fallback}</div>'">`
         : `<div class="summary-card-fallback">${fallback}</div>`;
       html += `
         <div class="summary-card">
