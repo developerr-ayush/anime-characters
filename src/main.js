@@ -2,38 +2,38 @@ import { trios, chars } from './data.js';
 
 // ============= STATE =============
 let currentTrioIdx = 0;
-const placements = {};  // { '0::Zero Two': 'date', ... }
-let trioPlacements = {}; // current trio: { date: 'Zero Two', ... }
+const placements = {};
+let trioPlacements = {};
 let selectedCard = null;
 
 // ============= ELEMENTS =============
-const charactersEl  = document.getElementById('characters');
-const zonesEls      = document.querySelectorAll('.zone');
-const roundNameEl   = document.getElementById('roundName');
-const trioCounterEl = document.getElementById('trioCounter');
-const progressFillEl= document.getElementById('progressFill');
-const hintEl        = document.getElementById('hint');
-const nextBtn       = document.getElementById('nextBtn');
-const resetBtn      = document.getElementById('resetBtn');
-const restartBtn    = document.getElementById('restartBtn');
-const gameEl        = document.getElementById('game');
-const summaryEl     = document.getElementById('summary');
+const charactersEl     = document.getElementById('characters');
+const zonesEls         = document.querySelectorAll('.zone');
+const roundNameEl      = document.getElementById('roundName');
+const trioCounterEl    = document.getElementById('trioCounter');
+const progressFillEl   = document.getElementById('progressFill');
+const hintEl           = document.getElementById('hint');
+const nextBtn          = document.getElementById('nextBtn');
+const resetBtn         = document.getElementById('resetBtn');
+const restartBtn       = document.getElementById('restartBtn');
+const gameEl           = document.getElementById('game');
+const summaryEl        = document.getElementById('summary');
 const summaryContentEl = document.getElementById('summaryContent');
 
 // ============= HELPERS =============
-const initialsOf = (name) => name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+const initialsOf = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 const safeImg    = (filename) => encodeURI(filename);
 
 function updateHint() {
-  const placedCount = Object.keys(trioPlacements).length;
-  if (placedCount === 3) {
-    hintEl.textContent = '✅ All three placed — tap Next →';
+  const placed = Object.keys(trioPlacements).length;
+  if (placed === 3) {
+    hintEl.innerHTML = `<span class="hint-icon">✅</span><span>All placed — tap Next!</span>`;
     hintEl.classList.remove('action');
   } else if (selectedCard) {
-    hintEl.textContent = `✨ "${selectedCard.dataset.name}" selected — tap Date, Marry or Kill`;
+    hintEl.innerHTML = `<span class="hint-icon">✨</span><span>"${selectedCard.dataset.name}" selected — tap a zone</span>`;
     hintEl.classList.add('action');
   } else {
-    hintEl.textContent = '👆 Tap a character, then tap a zone — or drag & drop';
+    hintEl.innerHTML = `<span class="hint-icon">👆</span><span>Tap a character, then tap a zone</span>`;
     hintEl.classList.remove('action');
   }
 }
@@ -41,20 +41,21 @@ function updateHint() {
 // ============= RENDER =============
 function renderTrio() {
   const trio = trios[currentTrioIdx];
-  roundNameEl.textContent = trio.round;
+  roundNameEl.textContent  = trio.round;
   trioCounterEl.textContent = `Trio ${currentTrioIdx + 1} / ${trios.length}`;
   progressFillEl.style.width = `${(currentTrioIdx / trios.length) * 100}%`;
 
   charactersEl.innerHTML = trio.characters.map((name) => {
     const c = chars[name];
+    const fallback = initialsOf(name);
     return `
-      <div class="char-card group relative rounded-2xl overflow-hidden border-2 border-brand-border cursor-pointer transition-all duration-300 hover:border-brand-pink hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-pink/20 active:scale-95" draggable="true" data-name="${name}">
-        <img class="w-full h-full object-cover bg-gradient-to-br from-brand-border to-bg-card" src="${safeImg(c.img)}" alt="${name}"
-             onerror="this.outerHTML='<div class=&quot;w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-pink to-brand-blue text-2xl font-black text-white&quot;>${initialsOf(name)}</div>'">
-        <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-brand-pink text-[10px] font-black uppercase tracking-widest text-white opacity-0 group-[.selected]:opacity-100 transition-opacity">selected</div>
-        <div class="char-info absolute inset-x-0 bottom-0 p-3 pt-10 pointer-events-none">
-          <div class="text-xs sm:text-sm font-black leading-tight text-white drop-shadow-md">${name}</div>
-          <div class="text-[10px] sm:text-xs text-text-dim drop-shadow-md mt-0.5">${c.anime}</div>
+      <div class="char-card" draggable="true" data-name="${name}">
+        <img class="char-img" src="${safeImg(c.img)}" alt="${name}"
+             onerror="this.outerHTML='<div class=&quot;char-img-fallback&quot;>${fallback}</div>'">
+        <div class="char-selected-badge">Selected</div>
+        <div class="char-overlay">
+          <div class="char-name">${name}</div>
+          <div class="char-anime">${c.anime}</div>
         </div>
       </div>
     `;
@@ -62,20 +63,17 @@ function renderTrio() {
 
   // Reset zones
   zonesEls.forEach(zone => {
-    const z = zone.dataset.zone;
+    const z     = zone.dataset.zone;
     const emoji = z === 'date' ? '💕' : z === 'marry' ? '💍' : '💀';
     const label = z[0].toUpperCase() + z.slice(1);
-    const colorClass = z === 'date' ? 'text-brand-gold' : z === 'marry' ? 'text-brand-green' : 'text-brand-red';
-    const borderClass = z === 'date' ? 'border-brand-gold/40' : z === 'marry' ? 'border-brand-green/40' : 'border-brand-red/40';
-    
-    zone.className = `zone group flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed ${borderClass} bg-bg-card/40 transition-all duration-200 cursor-pointer active:scale-95`;
-    zone.innerHTML = `<div class="text-3xl sm:text-4xl">${emoji}</div><div class="text-xs sm:text-sm font-bold uppercase tracking-wider ${colorClass}">${label}</div>`;
+    zone.classList.remove('filled', 'armed', 'drag-over');
+    zone.innerHTML = `<div class="zone-icon">${emoji}</div><div class="zone-label">${label}</div>`;
   });
 
   trioPlacements = {};
-  selectedCard = null;
-  nextBtn.disabled = true;
-  nextBtn.textContent = currentTrioIdx === trios.length - 1 ? 'See results 🎬' : 'Next →';
+  selectedCard   = null;
+  nextBtn.disabled    = true;
+  nextBtn.textContent = currentTrioIdx === trios.length - 1 ? 'See Results 🎬' : 'Next →';
 
   attachCardHandlers();
   updateHint();
@@ -83,21 +81,19 @@ function renderTrio() {
 
 function attachCardHandlers() {
   document.querySelectorAll('.char-card').forEach(card => {
-    // ----- Tap to select -----
     card.addEventListener('click', () => {
       if (card.dataset.placed === 'true') return;
       if (selectedCard === card) {
-        selectedCard.classList.remove('selected', 'ring-2', 'ring-brand-pink');
+        selectedCard.classList.remove('selected');
         selectedCard = null;
       } else {
-        if (selectedCard) selectedCard.classList.remove('selected', 'ring-2', 'ring-brand-pink');
+        if (selectedCard) selectedCard.classList.remove('selected');
         selectedCard = card;
-        card.classList.add('selected', 'ring-2', 'ring-brand-pink');
+        card.classList.add('selected');
       }
       updateHint();
     });
 
-    // ----- HTML5 drag (desktop) -----
     card.addEventListener('dragstart', e => {
       if (card.dataset.placed === 'true') { e.preventDefault(); return; }
       card.classList.add('dragging');
@@ -108,15 +104,14 @@ function attachCardHandlers() {
   });
 }
 
-// ----- Zones: tap-to-place + drag-and-drop -----
+// ============= ZONES =============
 zonesEls.forEach(zone => {
   zone.addEventListener('click', () => {
     if (zone.classList.contains('filled')) return;
     if (!selectedCard) {
-      // gentle nudge
-      hintEl.textContent = '👆 First tap a character above';
+      hintEl.innerHTML = `<span class="hint-icon">👆</span><span>First tap a character above</span>`;
       hintEl.classList.add('action');
-      setTimeout(updateHint, 1400);
+      setTimeout(updateHint, 1500);
       return;
     }
     placeCharacter(selectedCard.dataset.name, zone);
@@ -142,44 +137,45 @@ zonesEls.forEach(zone => {
   });
 });
 
-// Sync "armed" state on zones when a card is selected
+// Arm zones when a card is selected
 const armedObserver = new MutationObserver(() => {
   zonesEls.forEach(z => {
     if (selectedCard && !z.classList.contains('filled')) z.classList.add('armed');
     else z.classList.remove('armed');
   });
 });
-armedObserver.observe(charactersEl, { attributes: true, subtree: true, attributeFilter: ['class'] });
+armedObserver.observe(charactersEl, {
+  attributes: true,
+  subtree: true,
+  attributeFilter: ['class'],
+});
 
 // ============= PLACE =============
 function placeCharacter(name, zone) {
   if (Object.values(trioPlacements).includes(name)) return;
   const z = zone.dataset.zone;
 
-  // Mark source card placed
   const card = document.querySelector(`.char-card[data-name="${CSS.escape(name)}"]`);
   if (card) {
     card.dataset.placed = 'true';
-    card.classList.add('opacity-25', 'pointer-events-none', 'scale-95');
-    card.classList.remove('hover:border-brand-pink', 'hover:-translate-y-1', 'cursor-pointer');
+    card.classList.remove('selected');
   }
 
   trioPlacements[z] = name;
   placements[`${currentTrioIdx}::${name}`] = z;
 
-  const c = chars[name];
+  const c     = chars[name];
   const emoji = z === 'date' ? '💕' : z === 'marry' ? '💍' : '💀';
-  const borderClass = z === 'date' ? 'border-brand-gold' : z === 'marry' ? 'border-brand-green' : 'border-brand-red';
-  
-  zone.className = `zone filled relative overflow-hidden rounded-2xl border-2 ${borderClass} bg-bg-card transition-all duration-300`;
+  const fallback = initialsOf(name);
+
+  zone.classList.add('filled');
+  zone.classList.remove('armed');
   zone.innerHTML = `
-    <div class="relative w-full h-full group">
-      <img src="${safeImg(c.img)}" alt="${name}" class="w-full h-full object-cover"
-           onerror="this.outerHTML='<div class=&quot;w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-pink to-brand-blue text-lg font-black text-white&quot;>${initialsOf(name)}</div>'">
-      <div class="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md text-sm border border-white/10">${emoji}</div>
-      <div class="absolute inset-x-0 bottom-0 p-2 pt-6 bg-gradient-to-t from-black/90 to-transparent pointer-events-none">
-        <div class="text-[10px] font-bold text-white leading-tight truncate">${name}</div>
-      </div>
+    <div class="placed-card">
+      <img src="${safeImg(c.img)}" alt="${name}"
+           onerror="this.outerHTML='<div class=&quot;placed-fallback&quot;>${fallback}</div>'">
+      <div class="placed-emoji">${emoji}</div>
+      <div class="placed-name">${name}</div>
     </div>
   `;
 
@@ -198,7 +194,6 @@ nextBtn.addEventListener('click', () => {
 });
 
 resetBtn.addEventListener('click', () => {
-  // wipe placements for this trio only
   trios[currentTrioIdx].characters.forEach(name => {
     delete placements[`${currentTrioIdx}::${name}`];
   });
@@ -226,34 +221,32 @@ function showSummary() {
     if (!byRound[trio.round]) byRound[trio.round] = [];
     trio.characters.forEach(name => {
       const verdict = placements[`${idx}::${name}`];
-      if (verdict) byRound[trio.round].push({ name, verdict, anime: chars[name].anime, img: chars[name].img });
+      if (verdict) byRound[trio.round].push({
+        name, verdict, anime: chars[name].anime, img: chars[name].img,
+      });
     });
   });
 
   let html = '';
   for (const [round, items] of Object.entries(byRound)) {
     html += `
-      <div class="summary-section space-y-4">
-        <h3 class="text-xl font-bold text-brand-blue/80 border-b border-brand-border pb-2">${round}</h3>
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div class="summary-section">
+        <div class="summary-section-title">${round}</div>
+        <div class="summary-grid">
     `;
     items.forEach(item => {
-      const label = item.verdict === 'date' ? '💕 Date' : item.verdict === 'marry' ? '💍 Marry' : '💀 Kill';
-      const colorClass = item.verdict === 'date' ? 'text-brand-gold' : item.verdict === 'marry' ? 'text-brand-green' : 'text-brand-red';
-      const borderClass = item.verdict === 'date' ? 'border-brand-gold' : item.verdict === 'marry' ? 'border-brand-green' : 'border-brand-red';
-      
+      const label    = item.verdict === 'date' ? '💕 Date' : item.verdict === 'marry' ? '💍 Marry' : '💀 Kill';
+      const fallback = initialsOf(item.name);
       html += `
-        <div class="relative rounded-xl overflow-hidden border border-brand-border bg-bg-card group hover:border-brand-pink transition-colors">
-          <div class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-white/10 text-[9px] font-black uppercase tracking-wider ${colorClass}">
-            ${label}
+        <div class="summary-card">
+          <span class="verdict-chip ${item.verdict}">${label}</span>
+          <div class="summary-card-img-wrap">
+            <img src="${safeImg(item.img)}" alt="${item.name}"
+                 onerror="this.outerHTML='<div class=&quot;summary-card-fallback&quot;>${fallback}</div>'">
           </div>
-          <div class="aspect-square overflow-hidden">
-            <img src="${safeImg(item.img)}" alt="${item.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                 onerror="this.outerHTML='<div class=&quot;w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-pink to-brand-blue text-xl font-black text-white&quot;>${initialsOf(item.name)}</div>'">
-          </div>
-          <div class="p-2.5 text-center">
-            <div class="text-xs font-bold text-white truncate">${item.name}</div>
-            <div class="text-[9px] text-text-dim truncate mt-0.5">${item.anime}</div>
+          <div class="summary-card-info">
+            <div class="summary-card-name">${item.name}</div>
+            <div class="summary-card-anime">${item.anime}</div>
           </div>
         </div>
       `;

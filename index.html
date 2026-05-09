@@ -3,74 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-    <meta name="theme-color" content="#0a0815">
+    <meta name="theme-color" content="#060410">
     <title>Date · Marry · Kill — Anime Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="src/style.css">
 </head>
-<body class="text-text-main antialiased selection:bg-brand-pink/30">
-    <div class="app max-w-5xl mx-auto px-4 py-6 sm:py-10 mb-safe">
-        
-        <!-- Game screen -->
-        <div class="game space-y-6" id="game">
-            <header class="text-center space-y-4">
-                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-br from-brand-pink to-brand-blue bg-clip-text text-transparent">
-                    💕 Date · 💍 Marry · 💀 Kill
-                </h1>
-                
-                <div class="flex flex-col items-center gap-3">
-                    <div class="flex items-center gap-3 text-sm font-medium">
-                        <span class="px-3 py-1 rounded-full bg-brand-pink/15 border border-brand-pink/40 text-brand-pink" id="roundName">—</span>
-                        <span class="text-text-dim" id="trioCounter">Trio 1 / 10</span>
-                    </div>
-                    <div class="w-full max-w-xs h-1.5 bg-brand-border rounded-full overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-brand-pink to-brand-blue transition-all duration-500 ease-out" id="progressFill" style="width:0%"></div>
-                    </div>
+<body>
+
+    <!-- Ambient background -->
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="app-wrap">
+
+        <!-- ===== GAME SCREEN ===== -->
+        <div class="game" id="game">
+
+            <header class="game-header">
+                <div class="title-wrap">
+                    <h1 class="game-title">Date · Marry · Kill</h1>
+                    <p class="game-subtitle">Anime Edition</p>
+                </div>
+                <div class="round-meta">
+                    <span class="round-badge" id="roundName">—</span>
+                    <span class="trio-counter" id="trioCounter">Trio 1 / 10</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill" style="width:0%"></div>
                 </div>
             </header>
 
-            <div class="hint text-center text-sm py-2.5 px-6 rounded-full bg-brand-blue/10 border border-brand-blue/20 text-text-dim transition-all duration-300 mx-auto max-w-fit" id="hint">
-                👆 Tap a character, then tap a zone — or drag and drop
+            <div class="hint" id="hint">
+                <span class="hint-icon">👆</span>
+                <span>Tap a character, then tap a zone</span>
             </div>
 
-            <div class="characters grid grid-cols-3 gap-3 sm:gap-6" id="characters">
-                <!-- Characters will be injected here -->
-            </div>
+            <div class="characters" id="characters"></div>
 
-            <div class="zones grid grid-cols-3 gap-3 sm:gap-6">
-                <div class="zone group flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-brand-gold/40 bg-bg-card/40 transition-all duration-200 cursor-pointer active:scale-95" data-zone="date">
-                    <div class="text-3xl sm:text-4xl">💕</div>
-                    <div class="text-xs sm:text-sm font-bold uppercase tracking-wider text-brand-gold">Date</div>
+            <div class="zones">
+                <div class="zone" data-zone="date">
+                    <div class="zone-icon">💕</div>
+                    <div class="zone-label">Date</div>
                 </div>
-                <div class="zone group flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-brand-green/40 bg-bg-card/40 transition-all duration-200 cursor-pointer active:scale-95" data-zone="marry">
-                    <div class="text-3xl sm:text-4xl">💍</div>
-                    <div class="text-xs sm:text-sm font-bold uppercase tracking-wider text-brand-green">Marry</div>
+                <div class="zone" data-zone="marry">
+                    <div class="zone-icon">💍</div>
+                    <div class="zone-label">Marry</div>
                 </div>
-                <div class="zone group flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-brand-red/40 bg-bg-card/40 transition-all duration-200 cursor-pointer active:scale-95" data-zone="kill">
-                    <div class="text-3xl sm:text-4xl">💀</div>
-                    <div class="text-xs sm:text-sm font-bold uppercase tracking-wider text-brand-red">Kill</div>
+                <div class="zone" data-zone="kill">
+                    <div class="zone-icon">💀</div>
+                    <div class="zone-label">Kill</div>
                 </div>
             </div>
 
-            <div class="controls flex items-center justify-center gap-4 pt-4 sticky bottom-4 sm:static z-10">
-                <button class="flex-1 sm:flex-none px-8 py-4 rounded-xl bg-bg-card border border-brand-border font-bold text-sm hover:bg-brand-border transition-colors active:scale-95" id="resetBtn">
-                    ↺ Reset
-                </button>
-                <button class="flex-1 sm:flex-none px-8 py-4 rounded-xl bg-gradient-to-br from-brand-pink to-brand-blue font-bold text-sm shadow-lg shadow-brand-pink/20 disabled:opacity-40 disabled:pointer-events-none transition-all active:scale-95" id="nextBtn" disabled>
-                    Next →
-                </button>
+            <div class="controls">
+                <button class="btn btn-ghost" id="resetBtn">↺ Reset</button>
+                <button class="btn btn-primary" id="nextBtn" disabled>Next →</button>
             </div>
+
         </div>
 
-        <!-- Summary screen -->
-        <div class="summary hidden space-y-8 py-6" id="summary">
-            <h2 class="text-3xl sm:text-5xl font-extrabold text-center bg-gradient-to-br from-brand-pink to-brand-blue bg-clip-text text-transparent">
-                🎬 Your final choices
-            </h2>
-            <div id="summaryContent" class="space-y-10"></div>
-            <div class="flex justify-center pt-6">
-                <button class="px-10 py-4 rounded-xl bg-gradient-to-br from-brand-pink to-brand-blue font-bold text-lg shadow-lg shadow-brand-pink/20 transition-all active:scale-95" id="restartBtn">
-                    ↺ Play again
-                </button>
+        <!-- ===== SUMMARY SCREEN ===== -->
+        <div class="summary hidden" id="summary">
+            <div class="summary-header">
+                <h2 class="summary-title">Your Final Choices</h2>
+                <p class="summary-sub">🎬 Here's the verdict</p>
+            </div>
+            <div id="summaryContent"></div>
+            <div class="summary-footer">
+                <button class="btn btn-primary btn-lg" id="restartBtn">↺ Play Again</button>
             </div>
         </div>
 
