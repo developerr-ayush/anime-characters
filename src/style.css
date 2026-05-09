@@ -21,9 +21,11 @@
 
   --c-purple:     #b03aff;
   --c-purple-dim: rgba(176,58,255,0.12);
+  --c-purple-glow:rgba(176,58,255,0.35);
 
   --c-blue:       #4f6ef7;
   --c-blue-dim:   rgba(79,110,247,0.12);
+  --c-blue-glow:  rgba(79,110,247,0.35);
 
   --c-gold:       #ffbe0b;
   --c-gold-dim:   rgba(255,190,11,0.1);
@@ -68,7 +70,7 @@ body {
 }
 
 img { display: block; }
-button { font-family: inherit; }
+button { font-family: inherit; cursor: pointer; }
 
 /* ============================================
    AMBIENT BACKGROUND
@@ -111,9 +113,8 @@ button { font-family: inherit; }
   height: 360px;
   bottom: -80px;
   left: 50%;
-  transform: translateX(-50%);
   background: radial-gradient(circle, rgba(79,110,247,0.13) 0%, transparent 70%);
-  animation: orbFloat 34s ease-in-out infinite;
+  animation: orbFloat3 34s ease-in-out infinite;
   animation-delay: -18s;
 }
 
@@ -123,8 +124,6 @@ button { font-family: inherit; }
   66%      { transform: translate(-18px,12px) scale(0.97); }
 }
 
-.orb-3 { transform-origin: center center; }
-.orb-3:is(:root *) { animation-name: orbFloat3; }
 @keyframes orbFloat3 {
   0%,100% { transform: translateX(-50%) translate(0,0) scale(1); }
   33%      { transform: translateX(-50%) translate(20px,-14px) scale(1.03); }
@@ -137,38 +136,185 @@ button { font-family: inherit; }
 .app-wrap {
   position: relative;
   z-index: 1;
-  max-width: 480px;
+  max-width: 520px;
   margin: 0 auto;
-  padding: 20px 16px calc(env(safe-area-inset-bottom, 0px) + 80px);
+  padding: 24px 16px calc(env(safe-area-inset-bottom, 0px) + 32px);
   min-height: 100dvh;
 }
 
 @media (min-width: 600px) {
   .app-wrap {
-    max-width: 620px;
-    padding: 36px 24px 48px;
+    max-width: 680px;
+    padding: 40px 24px 48px;
   }
 }
 
 /* ============================================
-   GAME LAYOUT
+   HIDDEN UTILITY
    ============================================ */
-.game {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+.hidden { display: none !important; }
+
+/* ============================================
+   HOME SCREEN
+   ============================================ */
+#home {
+  animation: sectionEnter 0.5s var(--ease-out) both;
+}
+
+.home-header {
+  text-align: center;
+  padding: 8px 0 32px;
+}
+
+.home-title-wrap { margin-bottom: 8px; }
+
+.home-tagline {
+  font-size: 0.88rem;
+  color: var(--c-text-2);
+  margin-top: 10px;
 }
 
 /* ============================================
-   HEADER
+   MODE GRID
    ============================================ */
-.game-header {
-  text-align: center;
-  padding-top: 4px;
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
-.title-wrap { margin-bottom: 18px; }
+@media (min-width: 600px) {
+  .mode-grid { gap: 16px; }
+}
 
+.mode-card {
+  position: relative;
+  border-radius: var(--r-card);
+  padding: 18px 16px 16px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  cursor: pointer;
+  transition:
+    transform 0.26s var(--ease-bounce),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+  overflow: hidden;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Top accent bar */
+.mode-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--r-card) var(--r-card) 0 0;
+  transition: opacity 0.22s ease;
+}
+
+.mode-card[data-accent="pink"]::before   { background: linear-gradient(90deg, var(--c-pink), var(--c-purple)); }
+.mode-card[data-accent="red"]::before    { background: linear-gradient(90deg, var(--c-red), #ff6b35); }
+.mode-card[data-accent="purple"]::before { background: linear-gradient(90deg, var(--c-purple), var(--c-blue)); }
+.mode-card[data-accent="gold"]::before   { background: linear-gradient(90deg, var(--c-gold), #ff9500); }
+.mode-card[data-accent="green"]::before  { background: linear-gradient(90deg, var(--c-green), var(--c-blue)); }
+.mode-card[data-accent="blue"]::before   { background: linear-gradient(90deg, var(--c-blue), var(--c-purple)); }
+
+/* Hover glow */
+.mode-card:active { transform: scale(0.96); }
+
+@media (hover: hover) {
+  .mode-card[data-accent="pink"]:hover   { border-color: rgba(255,31,110,0.4);   box-shadow: 0 12px 40px rgba(255,31,110,0.15),   0 0 0 1px rgba(255,31,110,0.15); }
+  .mode-card[data-accent="red"]:hover    { border-color: rgba(255,23,68,0.4);    box-shadow: 0 12px 40px rgba(255,23,68,0.15),    0 0 0 1px rgba(255,23,68,0.15); }
+  .mode-card[data-accent="purple"]:hover { border-color: rgba(176,58,255,0.4);   box-shadow: 0 12px 40px rgba(176,58,255,0.15),   0 0 0 1px rgba(176,58,255,0.15); }
+  .mode-card[data-accent="gold"]:hover   { border-color: rgba(255,190,11,0.4);   box-shadow: 0 12px 40px rgba(255,190,11,0.15),   0 0 0 1px rgba(255,190,11,0.15); }
+  .mode-card[data-accent="green"]:hover  { border-color: rgba(14,242,138,0.4);   box-shadow: 0 12px 40px rgba(14,242,138,0.15),   0 0 0 1px rgba(14,242,138,0.15); }
+  .mode-card[data-accent="blue"]:hover   { border-color: rgba(79,110,247,0.4);   box-shadow: 0 12px 40px rgba(79,110,247,0.15),   0 0 0 1px rgba(79,110,247,0.15); }
+  .mode-card:hover { transform: translateY(-4px) scale(1.01); }
+}
+
+.mode-card-emoji {
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.mode-card-title {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--c-text);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.mode-card-desc {
+  font-size: 0.7rem;
+  color: var(--c-text-2);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.mode-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.mode-card-rounds {
+  font-size: 0.62rem;
+  color: var(--c-text-3);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.tag-pills {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+.tag-pill.tag-male     { color: #60a5fa; border-color: rgba(96,165,250,0.35); background: rgba(96,165,250,0.08); }
+.tag-pill.tag-female   { color: var(--c-pink); border-color: rgba(255,31,110,0.35); background: var(--c-pink-dim); }
+.tag-pill.tag-mix      { color: var(--c-purple); border-color: rgba(176,58,255,0.35); background: var(--c-purple-dim); }
+.tag-pill.tag-heroes   { color: var(--c-green); border-color: rgba(14,242,138,0.35); background: var(--c-green-dim); }
+.tag-pill.tag-villains { color: var(--c-red); border-color: rgba(255,23,68,0.35); background: var(--c-red-dim); }
+.tag-pill.tag-fan-favs { color: var(--c-gold); border-color: rgba(255,190,11,0.35); background: var(--c-gold-dim); }
+
+/* Stagger entrance for mode cards */
+@keyframes cardEnterHome {
+  from { opacity: 0; transform: translateY(20px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.mode-card { animation: cardEnterHome 0.45s var(--ease-bounce) both; }
+.mode-card:nth-child(1) { animation-delay: 0.05s; }
+.mode-card:nth-child(2) { animation-delay: 0.10s; }
+.mode-card:nth-child(3) { animation-delay: 0.15s; }
+.mode-card:nth-child(4) { animation-delay: 0.20s; }
+.mode-card:nth-child(5) { animation-delay: 0.25s; }
+.mode-card:nth-child(6) { animation-delay: 0.30s; }
+.mode-card:nth-child(7) { animation-delay: 0.35s; }
+
+/* ============================================
+   SHARED TITLE COMPONENTS
+   ============================================ */
 .game-title {
   font-size: clamp(1.7rem, 7.5vw, 2.8rem);
   font-weight: 900;
@@ -189,12 +335,51 @@ button { font-family: inherit; }
   margin-top: 5px;
 }
 
+/* ============================================
+   GAME SCREEN
+   ============================================ */
+#game {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: sectionEnter 0.4s var(--ease-out) both;
+}
+
+.game-header { text-align: center; }
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: var(--c-text-2);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 6px 0;
+  margin-bottom: 8px;
+  transition: color 0.18s ease;
+}
+
+.back-btn:hover { color: var(--c-text); }
+
+.mode-title {
+  font-size: clamp(1.1rem, 4vw, 1.6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(140deg, #ffffff 0%, #e0d2ff 40%, var(--c-pink) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+}
+
 .round-meta {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
@@ -393,10 +578,9 @@ button { font-family: inherit; }
   transform: translateY(0) scale(1);
 }
 
-/* Card entrance animation */
 @keyframes cardEnter {
   from { opacity: 0; transform: translateY(22px) scale(0.9); }
-  to   { opacity: 1; transform: translateY(0)    scale(1); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .char-card { animation: cardEnter 0.45s var(--ease-bounce) both; }
@@ -444,7 +628,7 @@ button { font-family: inherit; }
 .zone[data-zone="marry"] { border-color: rgba(14,242,138,0.25);  background: rgba(14,242,138,0.04); }
 .zone[data-zone="kill"]  { border-color: rgba(255,23,68,0.22);   background: rgba(255,23,68,0.04); }
 
-.zone-icon  {
+.zone-icon {
   font-size: 1.75rem;
   line-height: 1;
   transition: transform 0.28s var(--ease-bounce);
@@ -461,7 +645,6 @@ button { font-family: inherit; }
 .zone[data-zone="marry"] .zone-label { color: var(--c-green); }
 .zone[data-zone="kill"]  .zone-label { color: var(--c-red);   }
 
-/* Armed: a card is selected */
 .zone.armed:not(.filled) {
   border-style: solid;
   transform: scale(1.04);
@@ -485,13 +668,11 @@ button { font-family: inherit; }
 
 .zone.armed .zone-icon { transform: scale(1.18); }
 
-/* Drag-over */
 .zone.drag-over:not(.filled) {
   border-style: solid;
   transform: scale(1.07);
 }
 
-/* Filled */
 .zone.filled {
   aspect-ratio: 3 / 4;
   border-style: solid;
@@ -510,7 +691,6 @@ button { font-family: inherit; }
   .zone.filled       { aspect-ratio: 3 / 4; }
 }
 
-/* Placed card */
 .placed-card {
   position: relative;
   width: 100%;
@@ -575,7 +755,7 @@ button { font-family: inherit; }
 }
 
 /* ============================================
-   CONTROLS (sticky bottom on mobile)
+   CONTROLS
    ============================================ */
 .controls {
   display: flex;
@@ -589,7 +769,7 @@ button { font-family: inherit; }
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 50;
-  max-width: 480px;
+  max-width: 520px;
   margin: 0 auto;
 }
 
@@ -617,8 +797,7 @@ button { font-family: inherit; }
   transition:
     transform 0.24s var(--ease-bounce),
     opacity 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+    box-shadow 0.2s ease;
 }
 
 .btn:active { transform: scale(0.94) !important; }
@@ -665,18 +844,17 @@ button { font-family: inherit; }
 
 .btn-lg {
   flex: 0 0 auto;
-  padding: 16px 52px;
-  font-size: 1rem;
+  padding: 14px 36px;
+  font-size: 0.95rem;
   border-radius: 16px;
 }
 
 /* ============================================
    SUMMARY SCREEN
    ============================================ */
-.summary.hidden { display: none; }
-
-.summary {
+#summary {
   padding-bottom: 32px;
+  animation: sectionEnter 0.4s var(--ease-out) both;
 }
 
 .summary-header {
@@ -816,20 +994,21 @@ button { font-family: inherit; }
 .summary-footer {
   display: flex;
   justify-content: center;
+  gap: 12px;
   padding-top: 16px;
 }
 
 /* ============================================
-   SECTION ENTRANCE ANIMATIONS
+   ENTRANCE ANIMATIONS
    ============================================ */
 @keyframes sectionEnter {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.game > * { animation: sectionEnter 0.5s var(--ease-out) both; }
-.game > *:nth-child(1) { animation-delay: 0.00s; }
-.game > *:nth-child(2) { animation-delay: 0.06s; }
-.game > *:nth-child(3) { animation-delay: 0.10s; }
-.game > *:nth-child(4) { animation-delay: 0.14s; }
-.game > *:nth-child(5) { animation-delay: 0.18s; }
+#game > * { animation: sectionEnter 0.5s var(--ease-out) both; }
+#game > *:nth-child(1) { animation-delay: 0.00s; }
+#game > *:nth-child(2) { animation-delay: 0.05s; }
+#game > *:nth-child(3) { animation-delay: 0.08s; }
+#game > *:nth-child(4) { animation-delay: 0.11s; }
+#game > *:nth-child(5) { animation-delay: 0.14s; }

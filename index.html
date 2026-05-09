@@ -21,17 +21,32 @@
 
     <div class="app-wrap">
 
-        <!-- ===== GAME SCREEN ===== -->
-        <div class="game" id="game">
-
-            <header class="game-header">
-                <div class="title-wrap">
+        <!-- ===== HOME SCREEN ===== -->
+        <div id="home">
+            <header class="home-header">
+                <div class="home-title-wrap">
                     <h1 class="game-title">Date · Marry · Kill</h1>
                     <p class="game-subtitle">Anime Edition</p>
                 </div>
+                <p class="home-tagline">Pick a mode and defend your choices</p>
+            </header>
+
+            <div class="mode-grid" id="modeGrid">
+                <!-- Injected by main.js -->
+            </div>
+        </div>
+
+        <!-- ===== GAME SCREEN ===== -->
+        <div id="game" class="hidden">
+
+            <header class="game-header">
+                <button class="back-btn" id="backBtn">← Modes</button>
+                <div class="title-wrap">
+                    <h1 class="mode-title" id="modeTitle">—</h1>
+                </div>
                 <div class="round-meta">
                     <span class="round-badge" id="roundName">—</span>
-                    <span class="trio-counter" id="trioCounter">Trio 1 / 10</span>
+                    <span class="trio-counter" id="trioCounter">Trio 1 / 3</span>
                 </div>
                 <div class="progress-track">
                     <div class="progress-fill" id="progressFill" style="width:0%"></div>
@@ -68,14 +83,15 @@
         </div>
 
         <!-- ===== SUMMARY SCREEN ===== -->
-        <div class="summary hidden" id="summary">
+        <div id="summary" class="hidden">
             <div class="summary-header">
                 <h2 class="summary-title">Your Final Choices</h2>
                 <p class="summary-sub">🎬 Here's the verdict</p>
             </div>
             <div id="summaryContent"></div>
             <div class="summary-footer">
-                <button class="btn btn-primary btn-lg" id="restartBtn">↺ Play Again</button>
+                <button class="btn btn-ghost" id="playAgainBtn">↺ Play Again</button>
+                <button class="btn btn-primary btn-lg" id="homeBtn">← All Modes</button>
             </div>
         </div>
 

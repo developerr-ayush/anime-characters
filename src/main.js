@@ -1,36 +1,104 @@
-import { trios, chars } from './data.js';
+import { gameModes, chars } from './data.js';
 
 // ============= STATE =============
-let currentTrioIdx = 0;
-const placements = {};
-let trioPlacements = {};
-let selectedCard = null;
+let activeTrios      = [];
+let activeMode       = null;
+let currentTrioIdx   = 0;
+const placements     = {};
+let trioPlacements   = {};
+let selectedCard     = null;
 
 // ============= ELEMENTS =============
+const homeEl           = document.getElementById('home');
+const gameEl           = document.getElementById('game');
+const summaryEl        = document.getElementById('summary');
+const modeGridEl       = document.getElementById('modeGrid');
 const charactersEl     = document.getElementById('characters');
 const zonesEls         = document.querySelectorAll('.zone');
+const modeTitleEl      = document.getElementById('modeTitle');
 const roundNameEl      = document.getElementById('roundName');
 const trioCounterEl    = document.getElementById('trioCounter');
 const progressFillEl   = document.getElementById('progressFill');
 const hintEl           = document.getElementById('hint');
 const nextBtn          = document.getElementById('nextBtn');
 const resetBtn         = document.getElementById('resetBtn');
-const restartBtn       = document.getElementById('restartBtn');
-const gameEl           = document.getElementById('game');
-const summaryEl        = document.getElementById('summary');
+const backBtn          = document.getElementById('backBtn');
 const summaryContentEl = document.getElementById('summaryContent');
+const playAgainBtn     = document.getElementById('playAgainBtn');
+const homeBtn          = document.getElementById('homeBtn');
 
 // ============= HELPERS =============
 const initialsOf = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-const safeImg    = (filename) => encodeURI(filename);
+const safeImg    = (src)  => src ? encodeURI(src) : null;
 
+function tagClass(tag) {
+  const map = {
+    'Male':      'tag-male',
+    'Female':    'tag-female',
+    'Mix':       'tag-mix',
+    'Heroes':    'tag-heroes',
+    'Villains':  'tag-villains',
+    'Fan Favs':  'tag-fan-favs',
+  };
+  return map[tag] || 'tag-mix';
+}
+
+// ============= SCREEN MANAGEMENT =============
+function showScreen(screen) {
+  homeEl.classList.add('hidden');
+  gameEl.classList.add('hidden');
+  summaryEl.classList.add('hidden');
+  screen.classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============= HOME SCREEN =============
+function showHome() {
+  modeGridEl.innerHTML = gameModes.map(mode => {
+    const tagPills = mode.tags
+      .map(t => `<span class="tag-pill ${tagClass(t)}">${t}</span>`)
+      .join('');
+    const roundCount = mode.trios.length;
+    return `
+      <button class="mode-card" data-accent="${mode.accent}" data-mode="${mode.id}" type="button">
+        <div class="mode-card-emoji">${mode.emoji}</div>
+        <div class="mode-card-title">${mode.title}</div>
+        <div class="mode-card-desc">${mode.description}</div>
+        <div class="mode-card-footer">
+          <div class="tag-pills">${tagPills}</div>
+          <span class="mode-card-rounds">${roundCount} round${roundCount !== 1 ? 's' : ''}</span>
+        </div>
+      </button>
+    `;
+  }).join('');
+
+  modeGridEl.querySelectorAll('.mode-card').forEach(card => {
+    card.addEventListener('click', () => startMode(card.dataset.mode));
+  });
+
+  showScreen(homeEl);
+}
+
+// ============= START A MODE =============
+function startMode(modeId) {
+  activeMode   = gameModes.find(m => m.id === modeId);
+  activeTrios  = activeMode.trios;
+  currentTrioIdx = 0;
+  Object.keys(placements).forEach(k => delete placements[k]);
+
+  modeTitleEl.textContent = `${activeMode.emoji} ${activeMode.title}`;
+  showScreen(gameEl);
+  renderTrio();
+}
+
+// ============= HINT =============
 function updateHint() {
   const placed = Object.keys(trioPlacements).length;
   if (placed === 3) {
     hintEl.innerHTML = `<span class="hint-icon">✅</span><span>All placed — tap Next!</span>`;
     hintEl.classList.remove('action');
   } else if (selectedCard) {
-    hintEl.innerHTML = `<span class="hint-icon">✨</span><span>"${selectedCard.dataset.name}" selected — tap a zone</span>`;
+    hintEl.innerHTML = `<span class="hint-icon">✨</span><span>"${selectedCard.dataset.name}" — tap a zone</span>`;
     hintEl.classList.add('action');
   } else {
     hintEl.innerHTML = `<span class="hint-icon">👆</span><span>Tap a character, then tap a zone</span>`;
@@ -38,24 +106,29 @@ function updateHint() {
   }
 }
 
-// ============= RENDER =============
+// ============= RENDER TRIO =============
 function renderTrio() {
-  const trio = trios[currentTrioIdx];
-  roundNameEl.textContent  = trio.round;
-  trioCounterEl.textContent = `Trio ${currentTrioIdx + 1} / ${trios.length}`;
-  progressFillEl.style.width = `${(currentTrioIdx / trios.length) * 100}%`;
+  const trio = activeTrios[currentTrioIdx];
+  roundNameEl.textContent   = trio.round;
+  trioCounterEl.textContent = `Trio ${currentTrioIdx + 1} / ${activeTrios.length}`;
+  progressFillEl.style.width = `${(currentTrioIdx / activeTrios.length) * 100}%`;
 
   charactersEl.innerHTML = trio.characters.map((name) => {
-    const c = chars[name];
+    const c        = chars[name];
     const fallback = initialsOf(name);
+    const imgSrc   = c && c.img ? safeImg(c.img) : null;
+    const imgHtml  = imgSrc
+      ? `<img class="char-img" src="${imgSrc}" alt="${name}"
+              onerror="this.outerHTML='<div class=\\"char-img-fallback\\">${fallback}</div>'">`
+      : `<div class="char-img-fallback">${fallback}</div>`;
+    const anime = c ? c.anime : '';
     return `
       <div class="char-card" draggable="true" data-name="${name}">
-        <img class="char-img" src="${safeImg(c.img)}" alt="${name}"
-             onerror="this.outerHTML='<div class=&quot;char-img-fallback&quot;>${fallback}</div>'">
+        ${imgHtml}
         <div class="char-selected-badge">Selected</div>
         <div class="char-overlay">
           <div class="char-name">${name}</div>
-          <div class="char-anime">${c.anime}</div>
+          <div class="char-anime">${anime}</div>
         </div>
       </div>
     `;
@@ -73,12 +146,13 @@ function renderTrio() {
   trioPlacements = {};
   selectedCard   = null;
   nextBtn.disabled    = true;
-  nextBtn.textContent = currentTrioIdx === trios.length - 1 ? 'See Results 🎬' : 'Next →';
+  nextBtn.textContent = currentTrioIdx === activeTrios.length - 1 ? 'See Results 🎬' : 'Next →';
 
   attachCardHandlers();
   updateHint();
 }
 
+// ============= CARD HANDLERS =============
 function attachCardHandlers() {
   document.querySelectorAll('.char-card').forEach(card => {
     card.addEventListener('click', () => {
@@ -96,15 +170,13 @@ function attachCardHandlers() {
 
     card.addEventListener('dragstart', e => {
       if (card.dataset.placed === 'true') { e.preventDefault(); return; }
-      card.classList.add('dragging');
       e.dataTransfer.setData('text/plain', card.dataset.name);
       e.dataTransfer.effectAllowed = 'move';
     });
-    card.addEventListener('dragend', () => card.classList.remove('dragging'));
   });
 }
 
-// ============= ZONES =============
+// ============= ZONE HANDLERS =============
 zonesEls.forEach(zone => {
   zone.addEventListener('click', () => {
     if (zone.classList.contains('filled')) return;
@@ -150,10 +222,13 @@ armedObserver.observe(charactersEl, {
   attributeFilter: ['class'],
 });
 
-// ============= PLACE =============
+// ============= PLACE CHARACTER =============
 function placeCharacter(name, zone) {
   if (Object.values(trioPlacements).includes(name)) return;
-  const z = zone.dataset.zone;
+  const z    = zone.dataset.zone;
+  const c    = chars[name];
+  const emoji = z === 'date' ? '💕' : z === 'marry' ? '💍' : '💀';
+  const fallback = initialsOf(name);
 
   const card = document.querySelector(`.char-card[data-name="${CSS.escape(name)}"]`);
   if (card) {
@@ -164,16 +239,17 @@ function placeCharacter(name, zone) {
   trioPlacements[z] = name;
   placements[`${currentTrioIdx}::${name}`] = z;
 
-  const c     = chars[name];
-  const emoji = z === 'date' ? '💕' : z === 'marry' ? '💍' : '💀';
-  const fallback = initialsOf(name);
+  const imgSrc    = c && c.img ? safeImg(c.img) : null;
+  const imgHtml   = imgSrc
+    ? `<img src="${imgSrc}" alt="${name}"
+            onerror="this.outerHTML='<div class=\\"placed-fallback\\">${fallback}</div>'">`
+    : `<div class="placed-fallback">${fallback}</div>`;
 
   zone.classList.add('filled');
   zone.classList.remove('armed');
   zone.innerHTML = `
     <div class="placed-card">
-      <img src="${safeImg(c.img)}" alt="${name}"
-           onerror="this.outerHTML='<div class=&quot;placed-fallback&quot;>${fallback}</div>'">
+      ${imgHtml}
       <div class="placed-emoji">${emoji}</div>
       <div class="placed-name">${name}</div>
     </div>
@@ -184,7 +260,7 @@ function placeCharacter(name, zone) {
 
 // ============= CONTROLS =============
 nextBtn.addEventListener('click', () => {
-  if (currentTrioIdx < trios.length - 1) {
+  if (currentTrioIdx < activeTrios.length - 1) {
     currentTrioIdx++;
     renderTrio();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -194,36 +270,33 @@ nextBtn.addEventListener('click', () => {
 });
 
 resetBtn.addEventListener('click', () => {
-  trios[currentTrioIdx].characters.forEach(name => {
+  activeTrios[currentTrioIdx].characters.forEach(name => {
     delete placements[`${currentTrioIdx}::${name}`];
   });
   renderTrio();
 });
 
-restartBtn.addEventListener('click', () => {
-  currentTrioIdx = 0;
-  Object.keys(placements).forEach(k => delete placements[k]);
-  summaryEl.classList.add('hidden');
-  gameEl.classList.remove('hidden');
-  renderTrio();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+backBtn.addEventListener('click', showHome);
+homeBtn.addEventListener('click', showHome);
+
+playAgainBtn.addEventListener('click', () => {
+  startMode(activeMode.id);
 });
 
 // ============= SUMMARY =============
 function showSummary() {
-  gameEl.classList.add('hidden');
-  summaryEl.classList.remove('hidden');
   progressFillEl.style.width = '100%';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showScreen(summaryEl);
 
   const byRound = {};
-  trios.forEach((trio, idx) => {
+  activeTrios.forEach((trio, idx) => {
     if (!byRound[trio.round]) byRound[trio.round] = [];
     trio.characters.forEach(name => {
       const verdict = placements[`${idx}::${name}`];
-      if (verdict) byRound[trio.round].push({
-        name, verdict, anime: chars[name].anime, img: chars[name].img,
-      });
+      if (verdict) {
+        const c = chars[name] || {};
+        byRound[trio.round].push({ name, verdict, anime: c.anime || '', img: c.img || null });
+      }
     });
   });
 
@@ -237,13 +310,15 @@ function showSummary() {
     items.forEach(item => {
       const label    = item.verdict === 'date' ? '💕 Date' : item.verdict === 'marry' ? '💍 Marry' : '💀 Kill';
       const fallback = initialsOf(item.name);
+      const imgSrc   = item.img ? safeImg(item.img) : null;
+      const imgHtml  = imgSrc
+        ? `<img src="${imgSrc}" alt="${item.name}"
+                onerror="this.outerHTML='<div class=\\"summary-card-fallback\\">${fallback}</div>'">`
+        : `<div class="summary-card-fallback">${fallback}</div>`;
       html += `
         <div class="summary-card">
           <span class="verdict-chip ${item.verdict}">${label}</span>
-          <div class="summary-card-img-wrap">
-            <img src="${safeImg(item.img)}" alt="${item.name}"
-                 onerror="this.outerHTML='<div class=&quot;summary-card-fallback&quot;>${fallback}</div>'">
-          </div>
+          <div class="summary-card-img-wrap">${imgHtml}</div>
           <div class="summary-card-info">
             <div class="summary-card-name">${item.name}</div>
             <div class="summary-card-anime">${item.anime}</div>
@@ -257,4 +332,4 @@ function showSummary() {
 }
 
 // ============= INIT =============
-renderTrio();
+showHome();
