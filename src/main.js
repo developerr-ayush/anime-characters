@@ -1,4 +1,4 @@
-import { gameModes, eyesPacks, chars } from './data.js';
+import { gameModes, eyesPacks, chars, qbankQuestions, QBANK_CATEGORIES } from './data.js';
 
 // ============= STATE =============
 let activeTrios      = [];
@@ -29,6 +29,7 @@ const backBtn          = document.getElementById('backBtn');
 const summaryContentEl = document.getElementById('summaryContent');
 const playAgainBtn     = document.getElementById('playAgainBtn');
 const homeBtn          = document.getElementById('homeBtn');
+const qbankEl          = document.getElementById('qbank');
 
 // ============= HELPERS =============
 const initialsOf = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -54,6 +55,7 @@ function showScreen(screen) {
   summaryEl.classList.add('hidden');
   eyesScreenEl.classList.add('hidden');
   eyesSummaryEl.classList.add('hidden');
+  qbankEl.classList.add('hidden');
   screen.classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -94,6 +96,21 @@ function showHome() {
         </button>
       `;
     }).join('')}
+
+    <div class="home-section-label home-section-label--qbank">📋 Street Interview</div>
+    <button class="mode-card mode-card--wide" data-accent="blue" data-game="qbank" type="button">
+      <div class="mode-card-emoji">🎌</div>
+      <div class="mode-card-title">Comic Con 2026 · Question Bank</div>
+      <div class="mode-card-desc">32 curated anime discussion questions — filter by category, track what's been asked, drag to reorder</div>
+      <div class="mode-card-footer">
+        <div class="tag-pills">
+          <span class="tag-pill tag-villains">Controversial</span>
+          <span class="tag-pill tag-mix">Industry</span>
+          <span class="tag-pill tag-heroes">General</span>
+        </div>
+        <span class="mode-card-rounds">${qbankQuestions.length} questions</span>
+      </div>
+    </button>
   `;
 
   modeGridEl.querySelectorAll('[data-game="dmk"]').forEach(card => {
@@ -102,6 +119,8 @@ function showHome() {
   modeGridEl.querySelectorAll('[data-game="eyes"]').forEach(card => {
     card.addEventListener('click', () => startEyesPack(card.dataset.pack));
   });
+  modeGridEl.querySelector('[data-game="qbank"]')
+    .addEventListener('click', startQbank);
 
   showScreen(homeEl);
 }
@@ -542,6 +561,15 @@ document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   const key = e.key.toLowerCase();
 
+  // Close modal
+  if (key === 'escape') {
+    const modal = document.getElementById('qbankJsonModal');
+    if (modal && !modal.classList.contains('hidden')) {
+      closeQbankJsonViewer();
+      return;
+    }
+  }
+
   // Eyes game shortcuts
   if (!eyesScreenEl.classList.contains('hidden')) {
     if (key === 'r' && !eyesRevealed) { revealEyes(); return; }
@@ -562,6 +590,405 @@ document.addEventListener('keydown', e => {
       updateHint();
     }
   }
+});
+
+function loadQbankShots() {
+  try {
+    const raw = localStorage.getItem('qbank_shots');
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function saveQbankShots() {
+  localStorage.setItem('qbank_shots', JSON.stringify(qbankShotData));
+}
+
+// ============= QUESTION BANK =============
+let qbankItems    = qbankQuestions.map(q => ({ ...q })); // mutable session copy
+let qbankShotData = loadQbankShots();                     // { [id]: { count, shots: string[] } }
+let qbankFilter   = 'All';
+let qbankChecked  = {};
+let qbankDragId   = null;
+
+const QBANK_CAT_CLASS = {
+  'Controversial': 'qcat-controversial',
+  'Power Scaling': 'qcat-power',
+  'Industry':      'qcat-industry',
+  'General':       'qcat-general',
+};
+
+const QBANK_FILTER_CLASS = {
+  'All':           'qf-all',
+  'Controversial': 'qf-controversial',
+  'Power Scaling': 'qf-power',
+  'Industry':      'qf-industry',
+  'General':       'qf-general',
+};
+
+const QBANK_STAT_COLOR = {
+  'Controversial': 'var(--qc-controversial)',
+  'Power Scaling': 'var(--qc-power)',
+  'Industry':      'var(--qc-industry)',
+  'General':       'var(--qc-general)',
+};
+
+function startQbank() {
+  showScreen(qbankEl);
+  renderQbankFilters();
+  renderQbankList();
+  renderQbankMeta();
+  renderQbankFooterStats();
+}
+
+function getFilteredQbank() {
+  return qbankFilter === 'All'
+    ? qbankItems
+    : qbankItems.filter(q => q.category === qbankFilter);
+}
+
+function renderQbankMeta() {
+  const asked = Object.values(qbankChecked).filter(Boolean).length;
+  const metaEl = document.getElementById('qbankMeta');
+  if (metaEl) metaEl.textContent = `${qbankItems.length} questions · ${asked} asked · Drag to reorder`;
+}
+
+function renderQbankFilters() {
+  const filtersEl = document.getElementById('qbankFilters');
+  if (!filtersEl) return;
+  filtersEl.innerHTML = QBANK_CATEGORIES.map(cat => {
+    const isActive = qbankFilter === cat;
+    const cls = isActive ? QBANK_FILTER_CLASS[cat] : 'qf-inactive';
+    return `<button class="qbank-filter-btn ${cls}" data-cat="${cat}">${cat}</button>`;
+  }).join('');
+  filtersEl.querySelectorAll('.qbank-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      qbankFilter = btn.dataset.cat;
+      renderQbankFilters();
+      renderQbankList();
+    });
+  });
+}
+
+function renderQbankList() {
+  const listEl = document.getElementById('qbankList');
+  if (!listEl) return;
+  const filtered = getFilteredQbank();
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = `
+      <div class="qbank-empty">
+        <span class="qbank-empty-icon">📭</span>
+        No questions in this category yet.
+      </div>`;
+    return;
+  }
+
+  listEl.innerHTML = filtered.map((q, i) => {
+    const checked   = !!qbankChecked[q.id];
+    const catCls    = QBANK_CAT_CLASS[q.category] || 'qcat-general';
+    const shotCount = qbankShotData[q.id]?.count ?? 0;
+    const hasShots  = shotCount > 0;
+    return `
+      <div class="qcard${checked ? ' qcard-checked' : ''}" data-id="${q.id}" draggable="true">
+        <div class="qcard-num">${i + 1}</div>
+        <div class="qcard-body">
+          <div class="qcard-text">${q.text}</div>
+          <div class="qcard-tags">
+            <span class="qcat-pill ${catCls}">${q.category}</span>
+            ${q.viral ? '<span class="qviral-pill">🔥 Viral Pick</span>' : ''}
+          </div>
+        </div>
+        <div class="qcard-actions">
+          <button class="qcard-btn qbtn-shoot${hasShots ? ' has-shots' : ''}" data-id="${q.id}" title="Record a shot for this question">
+            🎬 <span class="shoot-count">${shotCount}</span>
+          </button>
+          <button class="qcard-btn qbtn-check${checked ? ' active' : ''}" data-id="${q.id}" title="Mark as asked">✓</button>
+          <button class="qcard-btn qbtn-del" data-id="${q.id}" title="Delete">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Attach per-card event handlers
+  listEl.querySelectorAll('.qcard').forEach(card => {
+    const id = Number(card.dataset.id);
+
+    card.querySelector('.qbtn-check').addEventListener('click', e => {
+      e.stopPropagation();
+      qbankToggleCheck(id, card);
+    });
+
+    card.querySelector('.qbtn-shoot').addEventListener('click', e => {
+      e.stopPropagation();
+      qbankShoot(id, card);
+    });
+
+    card.querySelector('.qbtn-del').addEventListener('click', e => {
+      e.stopPropagation();
+      qbankDelete(id, card);
+    });
+
+    // Drag to reorder
+    card.addEventListener('dragstart', () => {
+      qbankDragId = id;
+    });
+    card.addEventListener('dragend', () => {
+      qbankDragId = null;
+      card.classList.remove('qcard-drag-over');
+    });
+    card.addEventListener('dragover', e => {
+      e.preventDefault();
+      if (qbankDragId != null && qbankDragId !== id) card.classList.add('qcard-drag-over');
+    });
+    card.addEventListener('dragleave', () => card.classList.remove('qcard-drag-over'));
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      card.classList.remove('qcard-drag-over');
+      if (qbankDragId == null || qbankDragId === id) return;
+      const arr  = [...qbankItems];
+      const from = arr.findIndex(q => q.id === qbankDragId);
+      const to   = arr.findIndex(q => q.id === id);
+      if (from === -1 || to === -1) return;
+      const [item] = arr.splice(from, 1);
+      arr.splice(to, 0, item);
+      qbankItems  = arr;
+      qbankDragId = null;
+      renderQbankList();
+    });
+  });
+}
+
+function qbankToggleCheck(id, card) {
+  qbankChecked[id] = !qbankChecked[id];
+  const checked = qbankChecked[id];
+  card.classList.toggle('qcard-checked', checked);
+  const checkBtn = card.querySelector('.qbtn-check');
+  if (checkBtn) checkBtn.classList.toggle('active', checked);
+  vibrate(checked ? 10 : 6);
+  renderQbankMeta();
+}
+
+function qbankShoot(id, card) {
+  const now = new Date().toISOString();
+  if (!qbankShotData[id]) qbankShotData[id] = { count: 0, shots: [] };
+  qbankShotData[id].count++;
+  qbankShotData[id].shots.push(now);
+  saveQbankShots();
+
+  // Surgically update the shoot button (no full list rerender)
+  const btn = card.querySelector('.qbtn-shoot');
+  if (btn) {
+    btn.classList.add('has-shots');
+    const countEl = btn.querySelector('.shoot-count');
+    if (countEl) {
+      countEl.textContent = qbankShotData[id].count;
+      countEl.classList.remove('shoot-pop');
+      void countEl.offsetWidth; // force reflow for animation replay
+      countEl.classList.add('shoot-pop');
+    }
+  }
+
+  vibrate([12, 20, 12]);
+}
+
+function qbankDelete(id, card) {
+  card.style.overflow = 'hidden';
+  card.style.maxHeight = card.offsetHeight + 'px';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    card.style.transition = 'opacity 0.2s ease, transform 0.2s ease, max-height 0.28s ease, padding 0.28s ease';
+    card.style.opacity   = '0';
+    card.style.transform = 'translateX(14px) scale(0.96)';
+    card.style.maxHeight = '0';
+    card.style.paddingTop    = '0';
+    card.style.paddingBottom = '0';
+  }));
+  setTimeout(() => {
+    qbankItems = qbankItems.filter(q => q.id !== id);
+    delete qbankChecked[id];
+    card.remove();
+    // Renumber remaining cards
+    document.querySelectorAll('.qcard').forEach((c, i) => {
+      const n = c.querySelector('.qcard-num');
+      if (n) n.textContent = i + 1;
+    });
+    renderQbankMeta();
+    renderQbankFooterStats();
+  }, 310);
+}
+
+function renderQbankFooterStats() {
+  const el = document.getElementById('qbankFooterStats');
+  if (!el) return;
+  const cats = QBANK_CATEGORIES.filter(c => c !== 'All');
+  const viral = qbankItems.filter(q => q.viral).length;
+  el.innerHTML = [
+    ...cats.map(cat => {
+      const count = qbankItems.filter(q => q.category === cat).length;
+      return `<div class="qbank-stat"><b style="color:${QBANK_STAT_COLOR[cat]}">${count}</b> ${cat}</div>`;
+    }),
+    `<div class="qbank-stat"><b style="color:var(--qc-controversial)">${viral}</b> Viral</div>`,
+  ].join('');
+}
+
+// ============= JSON DATA VIEWER =============
+function buildQbankJsonData() {
+  const allIds = Object.keys(qbankShotData).map(Number);
+  const questions = allIds
+    .filter(id => qbankShotData[id]?.count > 0)
+    .map(id => {
+      const data = qbankShotData[id];
+      const q    = qbankItems.find(q => q.id === id) || qbankQuestions.find(q => q.id === id);
+      return {
+        id,
+        question:  q?.text     ?? '(deleted question)',
+        category:  q?.category ?? 'Unknown',
+        viral:     q?.viral    ?? false,
+        shotCount: data.count,
+        shotAt:    data.shots.map(ts => {
+          const d = new Date(ts);
+          return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }),
+      };
+    })
+    .sort((a, b) => b.shotCount - a.shotCount);
+
+  const totalShots = questions.reduce((s, q) => s + q.shotCount, 0);
+  return {
+    summary: {
+      totalShots,
+      totalQuestionsUsed: questions.length,
+      exportedAt: new Date().toLocaleString(),
+    },
+    questions,
+  };
+}
+
+function syntaxHighlightJson(json) {
+  return json.replace(
+    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+    match => {
+      if (/^"/.test(match)) {
+        return `<span class="${/:$/.test(match) ? 'json-key' : 'json-str'}">${match}</span>`;
+      }
+      if (/true|false/.test(match)) return `<span class="json-bool">${match}</span>`;
+      if (/null/.test(match))       return `<span class="json-null">${match}</span>`;
+      return `<span class="json-num">${match}</span>`;
+    }
+  );
+}
+
+function openQbankJsonViewer() {
+  const modal   = document.getElementById('qbankJsonModal');
+  const pre     = document.getElementById('qbankJsonPre');
+  const summary = document.getElementById('qbankJsonSummary');
+  const data    = buildQbankJsonData();
+
+  // Summary strip
+  summary.innerHTML = `
+    <div class="qjs-stat">
+      <span class="qjs-num" style="color:var(--qc-industry)">${data.summary.totalShots}</span>
+      <span class="qjs-label">Total Shots</span>
+    </div>
+    <div class="qjs-stat">
+      <span class="qjs-num" style="color:var(--qc-power)">${data.summary.totalQuestionsUsed}</span>
+      <span class="qjs-label">Questions Used</span>
+    </div>
+    <div class="qjs-stat">
+      <span class="qjs-num" style="color:var(--qc-general)">${qbankItems.length}</span>
+      <span class="qjs-label">In Bank</span>
+    </div>
+  `;
+
+  // JSON with syntax highlighting
+  const raw = JSON.stringify(data, null, 2);
+  pre.innerHTML = syntaxHighlightJson(raw);
+
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeQbankJsonViewer() {
+  document.getElementById('qbankJsonModal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+async function qbankCopyJson() {
+  const data = buildQbankJsonData();
+  const text = JSON.stringify(data, null, 2);
+  const btn  = document.getElementById('qbankJsonCopy');
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = '✓ Copied!';
+  } catch {
+    // Fallback for insecure contexts
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity  = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✓ Copied!';
+  }
+  setTimeout(() => { btn.textContent = 'Copy JSON'; }, 2200);
+}
+
+let _clearConfirmTimer = null;
+function qbankClearData() {
+  const btn = document.getElementById('qbankJsonClear');
+  if (btn.dataset.confirming === '1') {
+    // Second click — actually clear
+    qbankShotData = {};
+    localStorage.removeItem('qbank_shots');
+    clearTimeout(_clearConfirmTimer);
+    btn.textContent = 'Clear All';
+    btn.dataset.confirming = '0';
+    openQbankJsonViewer(); // refresh view
+    renderQbankList();     // reset shot counts on cards
+  } else {
+    btn.textContent = 'Confirm? ⚠️';
+    btn.dataset.confirming = '1';
+    _clearConfirmTimer = setTimeout(() => {
+      btn.textContent = 'Clear All';
+      btn.dataset.confirming = '0';
+    }, 3000);
+  }
+}
+
+document.getElementById('qbankViewJson').addEventListener('click', openQbankJsonViewer);
+document.getElementById('qbankJsonClose').addEventListener('click', closeQbankJsonViewer);
+document.getElementById('qbankModalBackdrop').addEventListener('click', closeQbankJsonViewer);
+document.getElementById('qbankJsonCopy').addEventListener('click', qbankCopyJson);
+document.getElementById('qbankJsonClear').addEventListener('click', qbankClearData);
+
+function qbankAddQuestion() {
+  const input = document.getElementById('qbankInput');
+  const text  = input.value.trim();
+  if (!text) {
+    input.focus();
+    input.style.borderColor = 'var(--qc-controversial)';
+    setTimeout(() => { input.style.borderColor = ''; }, 1200);
+    return;
+  }
+  const cat   = document.getElementById('qbankCatSelect').value;
+  const viral = document.getElementById('qbankViralCheck').checked;
+  qbankItems.push({ id: Date.now(), text, category: cat, viral });
+  input.value = '';
+  document.getElementById('qbankViralCheck').checked = false;
+  renderQbankList();
+  renderQbankMeta();
+  renderQbankFooterStats();
+  // Scroll to the newly added card
+  setTimeout(() => {
+    const listEl = document.getElementById('qbankList');
+    listEl?.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 50);
+}
+
+document.getElementById('qbankBackBtn').addEventListener('click', showHome);
+document.getElementById('qbankAddBtn').addEventListener('click', qbankAddQuestion);
+document.getElementById('qbankInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) qbankAddQuestion();
 });
 
 // ============= INIT =============

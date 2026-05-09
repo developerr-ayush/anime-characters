@@ -136,6 +136,44 @@ export const eyesPacks = [
   },
 ];
 
+// ============= QUESTION BANK =============
+export const QBANK_CATEGORIES = ['All', 'Controversial', 'Power Scaling', 'Industry', 'General'];
+
+export const qbankQuestions = [
+  { id: 1,  text: 'Are long running anime better than shorter anime in the recent era?',                                                                           category: 'Industry',      viral: true  },
+  { id: 2,  text: 'Why does Rent-a-Girlfriend have so many seasons?',                                                                                              category: 'Controversial', viral: true  },
+  { id: 3,  text: 'Do you think fanservice in anime should be decreased?',                                                                                         category: 'Controversial', viral: true  },
+  { id: 4,  text: 'Which is better — a weaker protagonist or one who is the strongest in their own verse?',                                                        category: 'Power Scaling', viral: false },
+  { id: 5,  text: 'What is your favorite genre in anime?',                                                                                                         category: 'General',       viral: false },
+  { id: 6,  text: 'Who is more powerful — Saitama or Goku?',                                                                                                      category: 'Power Scaling', viral: true  },
+  { id: 7,  text: 'Is anime becoming too mainstream?',                                                                                                             category: 'Controversial', viral: true  },
+  { id: 8,  text: 'Do you like younger protagonists or adult protagonists?',                                                                                       category: 'General',       viral: false },
+  { id: 9,  text: 'Who is the best girl in Rent-a-Girlfriend — Chizuru, Ruka, Sumi, or Mami?',                                                                   category: 'Controversial', viral: true  },
+  { id: 10, text: 'Did Solo Leveling deserve Anime of the Year over Frieren at the Crunchyroll Awards?',                                                           category: 'Controversial', viral: true  },
+  { id: 11, text: "Is JJK Season 3's Maki episode peak cinema or style over substance?",                                                                           category: 'Controversial', viral: true  },
+  { id: 12, text: 'Should anime studios be allowed to use AI in their production pipeline?',                                                                       category: 'Industry',      viral: true  },
+  { id: 13, text: 'Is One Piece sexist with the way it designs its female characters?',                                                                            category: 'Controversial', viral: true  },
+  { id: 14, text: 'Should manhwa and web novels from Korea or China even be adapted into anime?',                                                                  category: 'Industry',      viral: true  },
+  { id: 15, text: 'Is Crunchyroll destroying the anime community with its price hikes and monopoly?',                                                              category: 'Industry',      viral: true  },
+  { id: 16, text: 'Did JJK completely waste its female characters like Nobara and Maki by the end?',                                                               category: 'Controversial', viral: true  },
+  { id: 17, text: 'Is the anime adaptation always better than reading the manga or light novel?',                                                                  category: 'General',       viral: false },
+  { id: 18, text: 'Should anime be strictly faithful to the source material or can studios innovate?',                                                             category: 'Industry',      viral: false },
+  { id: 19, text: 'Is Demon Slayer just a pretty anime with zero substance, or does it actually deserve its hype?',                                                category: 'Controversial', viral: true  },
+  { id: 20, text: 'Sub vs Dub — is watching dubbed anime actually disrespectful to the creators?',                                                                 category: 'Controversial', viral: true  },
+  { id: 21, text: 'Is Mushoku Tensei a masterpiece or should it be cancelled for its problematic protagonist?',                                                    category: 'Controversial', viral: true  },
+  { id: 22, text: 'Is isekai as a genre just lazy writing and wish fulfillment at this point?',                                                                    category: 'Controversial', viral: true  },
+  { id: 23, text: 'Are anime-only watchers lesser fans than people who read the manga?',                                                                           category: 'Controversial', viral: true  },
+  { id: 24, text: 'Old school anime era (Naruto, Bleach, DBZ) vs modern anime — which era was actually better?',                                                  category: 'Controversial', viral: true  },
+  { id: 25, text: 'Is Blue Lock genuinely peak sports anime, or the most overrated show of the decade?',                                                           category: 'Controversial', viral: true  },
+  { id: 26, text: 'Should manga readers be banned from anime discussion threads to prevent spoilers?',                                                             category: 'Industry',      viral: false },
+  { id: 27, text: 'Is Dandadan the most creative anime in years, or is it just fanservice with a weird plot?',                                                     category: 'Controversial', viral: true  },
+  { id: 28, text: 'The Demon Slayer creator didn\'t get paid fairly despite the franchise making billions — is the anime industry exploiting its creators?',       category: 'Industry',      viral: true  },
+  { id: 29, text: 'Why are most romance anime just romance for lonely people?',                                                                                    category: 'Controversial', viral: true  },
+  { id: 30, text: 'Who is your favourite male/female duo in anime?',                                                                                               category: 'General',       viral: false },
+  { id: 31, text: 'What is one anime that is popular but still never gets talked about in general discussions?',                                                   category: 'General',       viral: false },
+  { id: 32, text: 'What is one anime everyone loves that you genuinely couldn\'t get into?',                                                                       category: 'Controversial', viral: true  },
+];
+
 // ============= ALL CHARACTERS =============
 export const chars = {
   // ---- Naruto ----
