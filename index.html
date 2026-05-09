@@ -95,6 +95,92 @@
             </div>
         </div>
 
+        <!-- ===== EYES GAME SCREEN ===== -->
+        <div id="eyes-screen" class="hidden">
+
+            <header class="game-header">
+                <button class="back-btn" id="eyesBackBtn">← Packs</button>
+                <div class="mode-title" id="eyesTitle">—</div>
+                <div class="eyes-meta">
+                    <span class="round-badge" id="eyesPack">Pack 1</span>
+                    <span class="trio-counter" id="eyesCounter">1 / 8</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="eyesProgress" style="width:0%"></div>
+                </div>
+            </header>
+
+            <!-- Score tracker -->
+            <div class="eyes-score-bar">
+                <div class="score-item score-got">
+                    <span class="score-icon">✓</span>
+                    <span id="eyesGotScore">0</span>
+                    <span class="score-label">Got it</span>
+                </div>
+                <div class="eyes-score-divider"></div>
+                <div class="score-item score-missed">
+                    <span class="score-icon">✗</span>
+                    <span id="eyesMissedScore">0</span>
+                    <span class="score-label">Missed</span>
+                </div>
+            </div>
+
+            <!-- The reveal card -->
+            <div class="eyes-card-wrap">
+                <div class="eyes-card" id="eyesCard">
+                    <!-- Eye image layer -->
+                    <div class="eyes-layer" id="eyesLayer">
+                        <img id="eyesImg" src="" alt="Guess the character">
+                        <div class="eyes-mystery-overlay">
+                            <span class="eyes-mystery-text">👁️ Who is this?</span>
+                        </div>
+                    </div>
+                    <!-- Face reveal layer (hidden until reveal) -->
+                    <div class="face-layer hidden" id="faceLayer">
+                        <img id="faceImg" src="" alt="Revealed character">
+                        <div class="face-revealed-badge">Revealed!</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="eyes-controls">
+                <div id="preReveal">
+                    <button class="btn btn-primary eyes-reveal-btn" id="revealBtn">
+                        <span>👁️ Reveal</span>
+                    </button>
+                </div>
+                <div id="postReveal" class="hidden post-reveal-btns">
+                    <button class="btn btn-miss" id="missedBtn">✗ Missed it</button>
+                    <button class="btn btn-got" id="gotItBtn">✓ Got it!</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== EYES SUMMARY ===== -->
+        <div id="eyes-summary" class="hidden">
+            <div class="summary-header">
+                <div class="eyes-summary-emoji" id="eyesSummaryEmoji">🎉</div>
+                <h2 class="summary-title" id="eyesSummaryTitle">Nice Try!</h2>
+                <p class="summary-sub" id="eyesSummaryScore">You got 5 out of 8</p>
+            </div>
+            <div class="eyes-score-breakdown">
+                <div class="score-breakdown-item got">
+                    <span class="breakdown-num" id="eyesFinalGot">0</span>
+                    <span class="breakdown-label">Got it ✓</span>
+                </div>
+                <div class="score-breakdown-item missed">
+                    <span class="breakdown-num" id="eyesFinalMissed">0</span>
+                    <span class="breakdown-label">Missed ✗</span>
+                </div>
+            </div>
+            <div class="summary-footer">
+                <button class="btn btn-ghost" id="eyesPlayAgainBtn">↺ Play Again</button>
+                <button class="btn btn-primary btn-lg" id="eyesHomeBtn">← All Packs</button>
+            </div>
+        </div>
+
     </div>
 
     <script type="module" src="src/main.js"></script>

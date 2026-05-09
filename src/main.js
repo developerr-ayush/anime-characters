@@ -1,4 +1,4 @@
-import { gameModes, chars } from './data.js';
+import { gameModes, eyesPacks, chars } from './data.js';
 
 // ============= STATE =============
 let activeTrios      = [];
@@ -12,6 +12,8 @@ let selectedCard     = null;
 const homeEl           = document.getElementById('home');
 const gameEl           = document.getElementById('game');
 const summaryEl        = document.getElementById('summary');
+const eyesScreenEl     = document.getElementById('eyes-screen');
+const eyesSummaryEl    = document.getElementById('eyes-summary');
 const modeGridEl       = document.getElementById('modeGrid');
 const charactersEl     = document.getElementById('characters');
 const zonesEls         = document.querySelectorAll('.zone');
@@ -48,32 +50,55 @@ function showScreen(screen) {
   homeEl.classList.add('hidden');
   gameEl.classList.add('hidden');
   summaryEl.classList.add('hidden');
+  eyesScreenEl.classList.add('hidden');
+  eyesSummaryEl.classList.add('hidden');
   screen.classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ============= HOME SCREEN =============
 function showHome() {
-  modeGridEl.innerHTML = gameModes.map(mode => {
-    const tagPills = mode.tags
-      .map(t => `<span class="tag-pill ${tagClass(t)}">${t}</span>`)
-      .join('');
-    const roundCount = mode.trios.length;
-    return `
-      <button class="mode-card" data-accent="${mode.accent}" data-mode="${mode.id}" type="button">
-        <div class="mode-card-emoji">${mode.emoji}</div>
-        <div class="mode-card-title">${mode.title}</div>
-        <div class="mode-card-desc">${mode.description}</div>
-        <div class="mode-card-footer">
-          <div class="tag-pills">${tagPills}</div>
-          <span class="mode-card-rounds">${roundCount} round${roundCount !== 1 ? 's' : ''}</span>
-        </div>
-      </button>
-    `;
-  }).join('');
+  modeGridEl.innerHTML = `
+    <div class="home-section-label">💕 Date · Marry · Kill</div>
+    ${gameModes.map(mode => {
+      const tagPills = mode.tags.map(t => `<span class="tag-pill ${tagClass(t)}">${t}</span>`).join('');
+      const roundCount = mode.trios.length;
+      return `
+        <button class="mode-card" data-accent="${mode.accent}" data-mode="${mode.id}" data-game="dmk" type="button">
+          <div class="mode-card-emoji">${mode.emoji}</div>
+          <div class="mode-card-title">${mode.title}</div>
+          <div class="mode-card-desc">${mode.description}</div>
+          <div class="mode-card-footer">
+            <div class="tag-pills">${tagPills}</div>
+            <span class="mode-card-rounds">${roundCount} round${roundCount !== 1 ? 's' : ''}</span>
+          </div>
+        </button>
+      `;
+    }).join('')}
 
-  modeGridEl.querySelectorAll('.mode-card').forEach(card => {
+    <div class="home-section-label home-section-label--eyes">👁️ Guess by Eyes</div>
+    ${eyesPacks.map(pack => {
+      const tagPills = pack.tags.map(t => `<span class="tag-pill ${tagClass(t)}">${t}</span>`).join('');
+      return `
+        <button class="mode-card" data-accent="${pack.accent}" data-pack="${pack.id}" data-game="eyes" type="button">
+          <div class="mode-card-emoji">${pack.emoji}</div>
+          <div class="mode-card-title">${pack.title}</div>
+          <div class="mode-card-pack-badge">${pack.pack}</div>
+          <div class="mode-card-desc">${pack.description}</div>
+          <div class="mode-card-footer">
+            <div class="tag-pills">${tagPills}</div>
+            <span class="mode-card-rounds">${pack.pairCount} pairs</span>
+          </div>
+        </button>
+      `;
+    }).join('')}
+  `;
+
+  modeGridEl.querySelectorAll('[data-game="dmk"]').forEach(card => {
     card.addEventListener('click', () => startMode(card.dataset.mode));
+  });
+  modeGridEl.querySelectorAll('[data-game="eyes"]').forEach(card => {
+    card.addEventListener('click', () => startEyesPack(card.dataset.pack));
   });
 
   showScreen(homeEl);
@@ -330,6 +355,125 @@ function showSummary() {
   }
   summaryContentEl.innerHTML = html;
 }
+
+// ============= EYES GAME =============
+let activePack     = null;
+let eyesIdx        = 0;
+let eyesGot        = 0;
+let eyesMissed     = 0;
+let eyesRevealed   = false;
+
+const eyesTitleEl    = document.getElementById('eyesTitle');
+const eyesPackEl     = document.getElementById('eyesPack');
+const eyesCounterEl  = document.getElementById('eyesCounter');
+const eyesProgressEl = document.getElementById('eyesProgress');
+const eyesGotEl      = document.getElementById('eyesGotScore');
+const eyesMissedEl   = document.getElementById('eyesMissedScore');
+const eyesCardEl     = document.getElementById('eyesCard');
+const eyesLayerEl    = document.getElementById('eyesLayer');
+const faceLayerEl    = document.getElementById('faceLayer');
+const eyesImgEl      = document.getElementById('eyesImg');
+const faceImgEl      = document.getElementById('faceImg');
+const preRevealEl    = document.getElementById('preReveal');
+const postRevealEl   = document.getElementById('postReveal');
+const revealBtn      = document.getElementById('revealBtn');
+const gotItBtn       = document.getElementById('gotItBtn');
+const missedBtn      = document.getElementById('missedBtn');
+const eyesBackBtn    = document.getElementById('eyesBackBtn');
+const eyesPlayAgainBtn = document.getElementById('eyesPlayAgainBtn');
+const eyesHomeBtn    = document.getElementById('eyesHomeBtn');
+const eyesFinalGotEl    = document.getElementById('eyesFinalGot');
+const eyesFinalMissedEl = document.getElementById('eyesFinalMissed');
+const eyesSummaryTitleEl = document.getElementById('eyesSummaryTitle');
+const eyesSummaryScoreEl = document.getElementById('eyesSummaryScore');
+const eyesSummaryEmojiEl = document.getElementById('eyesSummaryEmoji');
+
+function startEyesPack(packId) {
+  activePack   = eyesPacks.find(p => p.id === packId);
+  eyesIdx      = 0;
+  eyesGot      = 0;
+  eyesMissed   = 0;
+  eyesRevealed = false;
+
+  eyesTitleEl.textContent = `${activePack.emoji} ${activePack.title}`;
+  eyesPackEl.textContent  = activePack.pack;
+  showScreen(eyesScreenEl);
+  renderEyesCard();
+}
+
+function renderEyesCard() {
+  const pairNum  = eyesIdx + 1;                    // 1-based pair index
+  const eyeFile  = (eyesIdx * 2 + 1);              // odd  (1, 3, 5 …)
+  const faceFile = (eyesIdx * 2 + 2);              // even (2, 4, 6 …)
+  const base     = activePack.folder.split('/').map(encodeURIComponent).join('/');
+
+  eyesCounterEl.textContent  = `${pairNum} / ${activePack.pairCount}`;
+  eyesProgressEl.style.width = `${(eyesIdx / activePack.pairCount) * 100}%`;
+  eyesGotEl.textContent      = eyesGot;
+  eyesMissedEl.textContent   = eyesMissed;
+
+  // Pre-load both images
+  eyesImgEl.src = `${base}/${eyeFile}.jpg`;
+  faceImgEl.src = `${base}/${faceFile}.jpg`;
+
+  // Reset reveal state
+  eyesRevealed = false;
+  eyesLayerEl.classList.remove('hidden');
+  faceLayerEl.classList.add('hidden');
+  eyesCardEl.classList.remove('revealed');
+  preRevealEl.classList.remove('hidden');
+  postRevealEl.classList.add('hidden');
+}
+
+function revealEyes() {
+  if (eyesRevealed) return;
+  eyesRevealed = true;
+
+  eyesCardEl.classList.add('revealed');
+
+  // After flip animation, switch layers
+  setTimeout(() => {
+    eyesLayerEl.classList.add('hidden');
+    faceLayerEl.classList.remove('hidden');
+  }, 300);
+
+  preRevealEl.classList.add('hidden');
+  postRevealEl.classList.remove('hidden');
+}
+
+function scoreEyes(got) {
+  if (got) eyesGot++; else eyesMissed++;
+  eyesIdx++;
+
+  if (eyesIdx >= activePack.pairCount) {
+    showEyesSummary();
+  } else {
+    renderEyesCard();
+  }
+}
+
+function showEyesSummary() {
+  eyesProgressEl.style.width = '100%';
+  const total    = activePack.pairCount;
+  const pct      = Math.round((eyesGot / total) * 100);
+  const emoji    = pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '😅';
+  const title    = pct >= 80 ? 'Impressive!' : pct >= 50 ? 'Not Bad!' : 'Keep Practicing!';
+
+  eyesSummaryEmojiEl.textContent = emoji;
+  eyesSummaryTitleEl.textContent = title;
+  eyesSummaryScoreEl.textContent = `You got ${eyesGot} out of ${total}`;
+  eyesFinalGotEl.textContent     = eyesGot;
+  eyesFinalMissedEl.textContent  = eyesMissed;
+
+  showScreen(eyesSummaryEl);
+}
+
+revealBtn.addEventListener('click', revealEyes);
+gotItBtn.addEventListener('click', () => scoreEyes(true));
+missedBtn.addEventListener('click', () => scoreEyes(false));
+eyesBackBtn.addEventListener('click', showHome);
+eyesHomeBtn.addEventListener('click', showHome);
+eyesPlayAgainBtn.addEventListener('click', () => startEyesPack(activePack.id));
 
 // ============= INIT =============
 showHome();

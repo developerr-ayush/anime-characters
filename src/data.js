@@ -88,6 +88,54 @@ export const gameModes = [
   },
 ];
 
+// ============= EYES GUESS PACKS =============
+export const eyesPacks = [
+  {
+    id: 'female-eyes-1',
+    title: 'Female Characters',
+    pack: 'Pack 1',
+    emoji: '👁️',
+    description: 'Identify these female characters by their eyes alone',
+    tags: ['Female'],
+    accent: 'pink',
+    folder: 'Anime Female Characters by eyes',
+    pairCount: 8,
+  },
+  {
+    id: 'male-eyes-1',
+    title: 'Male Characters',
+    pack: 'Pack 1',
+    emoji: '👁️',
+    description: 'Identify these male characters by their eyes alone',
+    tags: ['Male'],
+    accent: 'blue',
+    folder: 'Anime Male Characters by eyes',
+    pairCount: 8,
+  },
+  {
+    id: 'female-eyes-2',
+    title: 'Female Characters',
+    pack: 'Pack 2',
+    emoji: '🎯',
+    description: 'Harder pack — more female characters to identify',
+    tags: ['Female'],
+    accent: 'purple',
+    folder: 'Guess Female Anime characters by eyes',
+    pairCount: 9,
+  },
+  {
+    id: 'male-eyes-2',
+    title: 'Male Characters',
+    pack: 'Pack 2',
+    emoji: '🎯',
+    description: 'Level up — trickier male characters to guess',
+    tags: ['Male'],
+    accent: 'green',
+    folder: 'Guess Male Anime characters by eyes',
+    pairCount: 10,
+  },
+];
+
 // ============= ALL CHARACTERS =============
 export const chars = {
   // ---- Naruto ----
