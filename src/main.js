@@ -22,6 +22,7 @@ const roundNameEl      = document.getElementById('roundName');
 const trioCounterEl    = document.getElementById('trioCounter');
 const progressFillEl   = document.getElementById('progressFill');
 const hintEl           = document.getElementById('hint');
+const pdotsEl          = document.getElementById('pdots');
 const nextBtn          = document.getElementById('nextBtn');
 const resetBtn         = document.getElementById('resetBtn');
 const backBtn          = document.getElementById('backBtn');
@@ -32,6 +33,7 @@ const homeBtn          = document.getElementById('homeBtn');
 // ============= HELPERS =============
 const initialsOf = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 const safeImg    = (src)  => src ? encodeURI(src) : null;
+const vibrate    = (ms = 14) => { try { navigator.vibrate?.(ms); } catch {} };
 
 function tagClass(tag) {
   const map = {
@@ -122,12 +124,15 @@ function updateHint() {
   if (placed === 3) {
     hintEl.innerHTML = `<span class="hint-icon">✅</span><span>All placed — tap Next!</span>`;
     hintEl.classList.remove('action');
+    hintEl.classList.add('complete');
   } else if (selectedCard) {
     hintEl.innerHTML = `<span class="hint-icon">✨</span><span>"${selectedCard.dataset.name}" — tap a zone</span>`;
     hintEl.classList.add('action');
+    hintEl.classList.remove('complete');
   } else {
     hintEl.innerHTML = `<span class="hint-icon">👆</span><span>Tap a character, then tap a zone</span>`;
     hintEl.classList.remove('action');
+    hintEl.classList.remove('complete');
   }
 }
 
@@ -168,9 +173,17 @@ function renderTrio() {
     zone.innerHTML = `<div class="zone-icon">${emoji}</div><div class="zone-label">${label}</div>`;
   });
 
+  // Reset placement dots
+  if (pdotsEl) {
+    pdotsEl.querySelectorAll('.pdot').forEach(d => {
+      d.classList.remove('filled-date', 'filled-marry', 'filled-kill');
+    });
+  }
+
   trioPlacements = {};
   selectedCard   = null;
   nextBtn.disabled    = true;
+  nextBtn.classList.remove('ready');
   nextBtn.textContent = currentTrioIdx === activeTrios.length - 1 ? 'See Results 🎬' : 'Next →';
 
   attachCardHandlers();
@@ -280,7 +293,21 @@ function placeCharacter(name, zone) {
     </div>
   `;
 
-  if (Object.keys(trioPlacements).length === 3) nextBtn.disabled = false;
+  // Update placement dot
+  if (pdotsEl) {
+    const dot = pdotsEl.querySelector(`.pdot[data-zone="${z}"]`);
+    if (dot) {
+      dot.classList.remove('filled-date', 'filled-marry', 'filled-kill');
+      dot.classList.add(`filled-${z}`);
+    }
+  }
+
+  vibrate();
+
+  if (Object.keys(trioPlacements).length === 3) {
+    nextBtn.disabled = false;
+    nextBtn.classList.add('ready');
+  }
 }
 
 // ============= CONTROLS =============
@@ -312,6 +339,30 @@ playAgainBtn.addEventListener('click', () => {
 function showSummary() {
   progressFillEl.style.width = '100%';
   showScreen(summaryEl);
+
+  // Populate tally counts
+  const counts = { date: 0, marry: 0, kill: 0 };
+  Object.values(placements).forEach(v => counts[v]++);
+  const tallyEl = document.getElementById('summaryTally');
+  if (tallyEl) {
+    tallyEl.innerHTML = `
+      <div class="tally-item tally-date">
+        <span class="tally-emoji">💕</span>
+        <span class="tally-num">${counts.date}</span>
+        <span class="tally-label">Dated</span>
+      </div>
+      <div class="tally-item tally-marry">
+        <span class="tally-emoji">💍</span>
+        <span class="tally-num">${counts.marry}</span>
+        <span class="tally-label">Married</span>
+      </div>
+      <div class="tally-item tally-kill">
+        <span class="tally-emoji">💀</span>
+        <span class="tally-num">${counts.kill}</span>
+        <span class="tally-label">Killed</span>
+      </div>
+    `;
+  }
 
   const byRound = {};
   activeTrios.forEach((trio, idx) => {
@@ -443,6 +494,16 @@ function revealEyes() {
 
 function scoreEyes(got) {
   if (got) eyesGot++; else eyesMissed++;
+
+  // Animate the changed score counter
+  const scoreEl = got ? eyesGotEl : eyesMissedEl;
+  scoreEl.textContent = got ? eyesGot : eyesMissed;
+  scoreEl.classList.remove('score-pop');
+  void scoreEl.offsetWidth; // force reflow
+  scoreEl.classList.add('score-pop');
+
+  vibrate(got ? [10, 30, 10] : [20]);
+
   eyesIdx++;
 
   if (eyesIdx >= activePack.pairCount) {
@@ -474,6 +535,34 @@ missedBtn.addEventListener('click', () => scoreEyes(false));
 eyesBackBtn.addEventListener('click', showHome);
 eyesHomeBtn.addEventListener('click', showHome);
 eyesPlayAgainBtn.addEventListener('click', () => startEyesPack(activePack.id));
+
+// ============= KEYBOARD SHORTCUTS =============
+document.addEventListener('keydown', e => {
+  // Ignore when typing in an input
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  const key = e.key.toLowerCase();
+
+  // Eyes game shortcuts
+  if (!eyesScreenEl.classList.contains('hidden')) {
+    if (key === 'r' && !eyesRevealed) { revealEyes(); return; }
+    if (key === 'g' && eyesRevealed)  { scoreEyes(true); return; }
+    if (key === 'm' && eyesRevealed)  { scoreEyes(false); return; }
+  }
+
+  // DMK game shortcuts
+  if (!gameEl.classList.contains('hidden')) {
+    if ((key === 'enter' || key === ' ') && !nextBtn.disabled) {
+      e.preventDefault();
+      nextBtn.click();
+      return;
+    }
+    if (key === 'escape' && selectedCard) {
+      selectedCard.classList.remove('selected');
+      selectedCard = null;
+      updateHint();
+    }
+  }
+});
 
 // ============= INIT =============
 showHome();

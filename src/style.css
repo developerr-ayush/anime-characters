@@ -319,10 +319,12 @@ button { font-family: inherit; cursor: pointer; }
   font-weight: 900;
   letter-spacing: -0.035em;
   line-height: 1.05;
-  background: linear-gradient(140deg, #ffffff 0%, #e0d2ff 28%, var(--c-pink) 62%, var(--c-purple) 100%);
+  background: linear-gradient(140deg, #ffffff 0%, #e0d2ff 20%, var(--c-pink) 45%, var(--c-purple) 65%, #e0d2ff 85%, #ffffff 100%);
+  background-size: 250% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: titleShimmer 8s ease-in-out infinite;
 }
 
 .game-subtitle {
@@ -350,17 +352,22 @@ button { font-family: inherit; cursor: pointer; }
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: none;
-  border: none;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--c-border);
   color: var(--c-text-2);
   font-size: 0.78rem;
   font-weight: 700;
-  padding: 6px 0;
+  padding: 6px 12px;
+  border-radius: 20px;
   margin-bottom: 8px;
-  transition: color 0.18s ease;
+  transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
 }
 
-.back-btn:hover { color: var(--c-text); }
+.back-btn:hover {
+  color: var(--c-text);
+  background: rgba(255,255,255,0.1);
+  border-color: var(--c-border-strong);
+}
 
 .mode-title {
   font-size: clamp(1.1rem, 4vw, 1.6rem);
@@ -401,19 +408,21 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .progress-track {
-  height: 3px;
+  height: 5px;
   max-width: 180px;
   margin: 0 auto;
   background: rgba(255,255,255,0.07);
-  border-radius: 2px;
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--c-pink), var(--c-purple));
-  border-radius: 2px;
+  background: linear-gradient(90deg, var(--c-pink), var(--c-purple), #c084fc, var(--c-pink));
+  background-size: 300% 100%;
+  border-radius: 3px;
   transition: width 0.5s var(--ease-out);
+  animation: progressShimmer 3s linear infinite;
 }
 
 /* ============================================
@@ -440,6 +449,7 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--c-pink-dim);
   border-color: rgba(255,31,110,0.3);
   color: var(--c-text);
+  animation: hintActionGlow 1.8s ease-in-out infinite;
 }
 
 .hint-icon { font-size: 1rem; }
@@ -649,20 +659,20 @@ button { font-family: inherit; cursor: pointer; }
   transform: scale(1.04);
 }
 
-.zone[data-zone="date"].armed  {
+.zone[data-zone="date"].armed {
   border-color: var(--c-gold);
   background: var(--c-gold-dim);
-  box-shadow: 0 0 22px rgba(255,190,11,0.14), inset 0 0 16px rgba(255,190,11,0.06);
+  animation: armedGlowDate 1.4s ease-in-out infinite;
 }
 .zone[data-zone="marry"].armed {
   border-color: var(--c-green);
   background: var(--c-green-dim);
-  box-shadow: 0 0 22px rgba(14,242,138,0.14), inset 0 0 16px rgba(14,242,138,0.06);
+  animation: armedGlowMarry 1.4s ease-in-out infinite;
 }
 .zone[data-zone="kill"].armed  {
   border-color: var(--c-red);
   background: var(--c-red-dim);
-  box-shadow: 0 0 22px rgba(255,23,68,0.14), inset 0 0 16px rgba(255,23,68,0.06);
+  animation: armedGlowKill 1.4s ease-in-out infinite;
 }
 
 .zone.armed .zone-icon { transform: scale(1.18); }
@@ -1369,3 +1379,233 @@ button { font-family: inherit; cursor: pointer; }
 #eyes-screen > *:nth-child(3) { animation-delay: 0.10s; }
 #eyes-screen > *:nth-child(4) { animation-delay: 0.14s; }
 #eyes-screen > *:nth-child(5) { animation-delay: 0.18s; }
+
+/* ============================================
+   TITLE SHIMMER
+   ============================================ */
+@keyframes titleShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+/* ============================================
+   PROGRESS BAR SHIMMER
+   ============================================ */
+@keyframes progressShimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* ============================================
+   ZONE ARMED PULSE
+   ============================================ */
+@keyframes armedGlowDate {
+  0%, 100% { box-shadow: 0 0 22px rgba(255,190,11,0.14), inset 0 0 16px rgba(255,190,11,0.06); }
+  50%       { box-shadow: 0 0 48px rgba(255,190,11,0.38), inset 0 0 30px rgba(255,190,11,0.16); }
+}
+@keyframes armedGlowMarry {
+  0%, 100% { box-shadow: 0 0 22px rgba(14,242,138,0.14), inset 0 0 16px rgba(14,242,138,0.06); }
+  50%       { box-shadow: 0 0 48px rgba(14,242,138,0.38), inset 0 0 30px rgba(14,242,138,0.16); }
+}
+@keyframes armedGlowKill {
+  0%, 100% { box-shadow: 0 0 22px rgba(255,23,68,0.14), inset 0 0 16px rgba(255,23,68,0.06); }
+  50%       { box-shadow: 0 0 48px rgba(255,23,68,0.38), inset 0 0 30px rgba(255,23,68,0.16); }
+}
+
+/* ============================================
+   HINT GLOW ANIMATIONS
+   ============================================ */
+@keyframes hintActionGlow {
+  0%, 100% { box-shadow: none; }
+  50%       { box-shadow: 0 0 20px rgba(255,31,110,0.22), 0 0 0 1px rgba(255,31,110,0.14); }
+}
+@keyframes hintCompletePulse {
+  0%, 100% { box-shadow: none; }
+  50%       { box-shadow: 0 0 20px rgba(14,242,138,0.22), 0 0 0 1px rgba(14,242,138,0.14); }
+}
+
+.hint.complete {
+  background: rgba(14,242,138,0.07);
+  border-color: rgba(14,242,138,0.32);
+  color: var(--c-green);
+  animation: hintCompletePulse 1.8s ease-in-out infinite;
+}
+
+/* ============================================
+   PLACEMENT INDICATOR DOTS
+   ============================================ */
+.pdots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pdot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  background: transparent;
+  transition: all 0.35s var(--ease-bounce);
+}
+
+@keyframes pdotPop {
+  0%   { transform: scale(0.4); }
+  60%  { transform: scale(1.45); }
+  100% { transform: scale(1); }
+}
+
+.pdot.filled-date  {
+  background: var(--c-gold);
+  border-color: var(--c-gold);
+  box-shadow: 0 0 8px rgba(255,190,11,0.55);
+  animation: pdotPop 0.4s var(--ease-bounce) both;
+}
+.pdot.filled-marry {
+  background: var(--c-green);
+  border-color: var(--c-green);
+  box-shadow: 0 0 8px rgba(14,242,138,0.55);
+  animation: pdotPop 0.4s var(--ease-bounce) both;
+}
+.pdot.filled-kill  {
+  background: var(--c-red);
+  border-color: var(--c-red);
+  box-shadow: 0 0 8px rgba(255,23,68,0.55);
+  animation: pdotPop 0.4s var(--ease-bounce) both;
+}
+
+/* ============================================
+   NEXT BUTTON READY PULSE
+   ============================================ */
+@keyframes btnReadyPulse {
+  0%, 100% {
+    box-shadow:
+      0 8px 24px rgba(255,31,110,0.28),
+      0 2px 8px rgba(176,58,255,0.2);
+  }
+  50% {
+    box-shadow:
+      0 12px 38px rgba(255,31,110,0.52),
+      0 4px 14px rgba(176,58,255,0.38);
+  }
+}
+
+.btn-primary.ready {
+  animation: btnReadyPulse 1.5s ease-in-out infinite;
+}
+
+/* ============================================
+   SUMMARY TALLY
+   ============================================ */
+.summary-tally {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.tally-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 12px 16px;
+  border-radius: 18px;
+  border: 1px solid;
+  text-align: center;
+  animation: sectionEnter 0.5s var(--ease-out) both;
+}
+.tally-item:nth-child(1) { animation-delay: 0.05s; }
+.tally-item:nth-child(2) { animation-delay: 0.12s; }
+.tally-item:nth-child(3) { animation-delay: 0.19s; }
+
+.tally-item.tally-date  { background: rgba(255,190,11,0.05);  border-color: rgba(255,190,11,0.22); }
+.tally-item.tally-marry { background: rgba(14,242,138,0.04);  border-color: rgba(14,242,138,0.2); }
+.tally-item.tally-kill  { background: rgba(255,23,68,0.04);   border-color: rgba(255,23,68,0.2); }
+
+.tally-emoji { font-size: 1.6rem; line-height: 1; }
+
+.tally-num {
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.tally-item.tally-date  .tally-num { color: var(--c-gold); }
+.tally-item.tally-marry .tally-num { color: var(--c-green); }
+.tally-item.tally-kill  .tally-num { color: var(--c-red); }
+
+.tally-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--c-text-2);
+}
+
+/* ============================================
+   KEYBOARD HINTS
+   ============================================ */
+.kbd-hint {
+  display: none;
+  text-align: center;
+  color: var(--c-text-3);
+  font-size: 0.7rem;
+  padding-top: 8px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .kbd-hint { display: block; }
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  font-family: inherit;
+  font-size: 0.65rem;
+  color: var(--c-text-2);
+  margin: 0 1px;
+}
+
+/* ============================================
+   SCORE POP ANIMATION (EYES GAME)
+   ============================================ */
+@keyframes scorePop {
+  0%   { transform: scale(1.6); }
+  100% { transform: scale(1); }
+}
+
+.score-pop {
+  display: inline-block;
+  animation: scorePop 0.38s var(--ease-bounce) both;
+}
+
+/* ============================================
+   EYES SUMMARY EMOJI POP
+   ============================================ */
+@keyframes emojiPop {
+  0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+  55%  { transform: scale(1.25) rotate(6deg); opacity: 1; }
+  75%  { transform: scale(0.9) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.eyes-summary-emoji {
+  animation: emojiPop 0.75s var(--ease-bounce) 0.2s both;
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.1ms !important;
+  }
+}

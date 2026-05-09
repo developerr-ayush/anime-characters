@@ -51,6 +51,11 @@
                 <div class="progress-track">
                     <div class="progress-fill" id="progressFill" style="width:0%"></div>
                 </div>
+                <div class="pdots" id="pdots">
+                    <span class="pdot" data-zone="date" title="Date"></span>
+                    <span class="pdot" data-zone="marry" title="Marry"></span>
+                    <span class="pdot" data-zone="kill" title="Kill"></span>
+                </div>
             </header>
 
             <div class="hint" id="hint">
@@ -88,6 +93,7 @@
                 <h2 class="summary-title">Your Final Choices</h2>
                 <p class="summary-sub">🎬 Here's the verdict</p>
             </div>
+            <div class="summary-tally" id="summaryTally"></div>
             <div id="summaryContent"></div>
             <div class="summary-footer">
                 <button class="btn btn-ghost" id="playAgainBtn">↺ Play Again</button>
@@ -154,6 +160,7 @@
                     <button class="btn btn-miss" id="missedBtn">✗ Missed it</button>
                     <button class="btn btn-got" id="gotItBtn">✓ Got it!</button>
                 </div>
+                <p class="kbd-hint"><kbd>R</kbd> reveal · <kbd>G</kbd> got it · <kbd>M</kbd> missed</p>
             </div>
 
         </div>
