@@ -36,6 +36,40 @@ const initialsOf = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2)
 const safeImg    = (src)  => src ? encodeURI(src) : null;
 const vibrate    = (ms = 14) => { try { navigator.vibrate?.(ms); } catch {} };
 
+const preloadedImages = new Set();
+
+const preloadImage = (src) => {
+  if (!src || preloadedImages.has(src)) return Promise.resolve();
+  preloadedImages.add(src);
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = () => resolve();
+    img.src = src;
+  });
+};
+
+function collectAllImageUrls() {
+  const urls = new Set();
+  Object.values(chars).forEach(c => {
+    const src = safeImg(c?.img);
+    if (src) urls.add(src);
+  });
+  eyesPacks.forEach(pack => {
+    const base = pack.folder.split('/').map(encodeURIComponent).join('/');
+    const total = pack.pairCount * 2;
+    for (let i = 1; i <= total; i++) {
+      urls.add(`${base}/${i}.jpg`);
+    }
+  });
+  return [...urls];
+}
+
+function preloadAllImages() {
+  const urls = collectAllImageUrls();
+  return Promise.all(urls.map(preloadImage));
+}
+
 function tagClass(tag) {
   const map = {
     'Male':      'tag-male',
@@ -992,4 +1026,6 @@ document.getElementById('qbankInput').addEventListener('keydown', e => {
 });
 
 // ============= INIT =============
-showHome();
+preloadAllImages()
+  .catch(() => {})
+  .finally(showHome);
