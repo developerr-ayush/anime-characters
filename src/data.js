@@ -177,78 +177,78 @@ export const qbankQuestions = [
 // ============= ALL CHARACTERS =============
 export const chars = {
   // ---- Naruto ----
-  'Naruto':         { img: 'images/how-to-draw-naruto-20.png', anime: 'Naruto' },
-  'Sasuke':         { img: 'images/sasuke.png',        anime: 'Naruto' },
-  'Kakashi':        { img: 'images/kakashi.webp',       anime: 'Naruto' },
-  'Madara':         { img: 'images/madara.avif',        anime: 'Naruto' },
-  'Pain':           { img: null,                         anime: 'Naruto' },
-  'Obito':          { img: 'images/obito.png',          anime: 'Naruto' },
-  'Itachi':         { img: 'images/itachi.webp',        anime: 'Naruto' },
+  'Naruto':         { img: 'images/Naruto Uzumaki.jpg', anime: 'Naruto' },
+  'Sasuke':         { img: 'images/Sasuke Uchiha.png',        anime: 'Naruto' },
+  'Kakashi':        { img: 'images/Kakashi Hatake.webp',       anime: 'Naruto' },
+  'Madara':         { img: 'images/Madara Uchiha.avif',        anime: 'Naruto' },
+  'Pain':           { img: 'images/Pain.png',                         anime: 'Naruto' },
+  'Obito':          { img: 'images/Obito Uchiha.png',          anime: 'Naruto' },
+  'Itachi':         { img: 'images/Itachi Uchiha.webp',        anime: 'Naruto' },
 
   // ---- One Piece ----
-  'Luffy':          { img: 'images/luffy.png',          anime: 'One Piece' },
-  'Zoro':           { img: 'images/zoro.png',           anime: 'One Piece' },
-  'Sanji':          { img: 'images/sanji.webp',         anime: 'One Piece' },
-  'Nami':           { img: 'images/nami.jpg',           anime: 'One Piece' },
-  'Nico Robin':     { img: 'images/nico-robin.png',     anime: 'One Piece' },
-  'Boa Hancock':    { img: 'images/boa-hancock.jpg',    anime: 'One Piece' },
+  'Luffy':          { img: 'images/Monkey D. Luffy.png',          anime: 'One Piece' },
+  'Zoro':           { img: 'images/Roronoa Zoro.png',           anime: 'One Piece' },
+  'Sanji':          { img: 'images/Sanji.webp',         anime: 'One Piece' },
+  'Nami':           { img: 'images/Nami.webp',           anime: 'One Piece' },
+  'Nico Robin':     { img: 'images/Nico Robin.png',     anime: 'One Piece' },
+  'Boa Hancock':    { img: 'images/Boa Hancock.jpg',    anime: 'One Piece' },
 
   // ---- Jujutsu Kaisen ----
-  'Satoru Gojo':    { img: 'images/gojo.webp',          anime: 'Jujutsu Kaisen' },
-  'Nanami':         { img: null,                         anime: 'Jujutsu Kaisen' },
-  'Geto':           { img: 'images/geto.webp',          anime: 'Jujutsu Kaisen' },
-  'Nobara Kugisaki':{ img: 'images/nobara.png',         anime: 'Jujutsu Kaisen' },
-  'Maki Zenin':     { img: 'images/maki-zenin.jpeg',    anime: 'Jujutsu Kaisen' },
+  'Satoru Gojo':    { img: 'images/Satoru Gojo.webp',          anime: 'Jujutsu Kaisen' },
+  'Nanami':         { img: 'images/Nanami.jpg',                         anime: 'Jujutsu Kaisen' },
+  'Geto':           { img: 'images/Suguru Geto.webp',          anime: 'Jujutsu Kaisen' },
+  'Nobara Kugisaki':{ img: 'images/Nobara Kugisaki.png',         anime: 'Jujutsu Kaisen' },
+  'Maki Zenin':     { img: 'images/Maki Zenin.jpg',    anime: 'Jujutsu Kaisen' },
 
   // ---- Attack on Titan ----
-  'Levi':           { img: 'images/levi.jpg',           anime: 'Attack on Titan' },
-  'Mikasa Ackerman':{ img: 'images/mikasa.jpg',         anime: 'Attack on Titan' },
-  'Historia Reiss': { img: 'images/historia.jpg',       anime: 'Attack on Titan' },
-  'Sasha Braus':    { img: 'images/sasha.jpg',          anime: 'Attack on Titan' },
+  'Levi':           { img: 'images/Levi Ackerman.jpg',           anime: 'Attack on Titan' },
+  'Mikasa Ackerman':{ img: 'images/Mikasa Ackerman.jpg',         anime: 'Attack on Titan' },
+  'Historia Reiss': { img: 'images/Historia Reiss.jpg',       anime: 'Attack on Titan' },
+  'Sasha Braus':    { img: 'images/Sasha Braus.jpg',          anime: 'Attack on Titan' },
 
   // ---- Dragon Ball ----
-  'Vegeta':         { img: null,                         anime: 'Dragon Ball Z' },
+  'Vegeta':         { img: 'images/Vegeta.jpg',                         anime: 'Dragon Ball Z' },
 
   // ---- Crossover Villains ----
-  'Griffith':       { img: 'images/griffith.webp',      anime: 'Berserk' },
-  'Dio':            { img: null,                         anime: "JoJo's Bizarre Adventure" },
-  'Light Yagami':   { img: 'images/light-yagami.png',   anime: 'Death Note' },
+  'Griffith':       { img: 'images/Griffith.webp',      anime: 'Berserk' },
+  'Dio':            { img: 'images/Dio Brando.jpeg',                         anime: "JoJo's Bizarre Adventure" },
+  'Light Yagami':   { img: 'images/Light Yagami.png',   anime: 'Death Note' },
 
   // ---- Re:Zero ----
-  'Rem':            { img: 'images/rem.jpg',            anime: 'Re:Zero' },
-  'Ram':            { img: 'images/ram.jpg',            anime: 'Re:Zero' },
-  'Emilia':         { img: 'images/emilia.jpg',         anime: 'Re:Zero' },
+  'Rem':            { img: 'images/Rem.jpg',            anime: 'Re:Zero' },
+  'Ram':            { img: 'images/Ram.jpg',            anime: 'Re:Zero' },
+  'Emilia':         { img: 'images/Emilia.jpg',         anime: 'Re:Zero' },
 
   // ---- Demon Slayer ----
-  'Nezuko Kamado':  { img: 'images/nezuko.jpeg',        anime: 'Demon Slayer' },
+  'Nezuko Kamado':  { img: 'images/Nezuko Kamado.jpg',        anime: 'Demon Slayer' },
 
   // ---- Overlord ----
-  'Albedo':         { img: 'images/albedo.jpg',         anime: 'Overlord' },
-  'Shalltear':      { img: 'images/shalltear.jpeg',     anime: 'Overlord' },
+  'Albedo':         { img: 'images/Albedo.jpeg',         anime: 'Overlord' },
+  'Shalltear':      { img: 'images/Shalltear Bloodfallen.jpg',     anime: 'Overlord' },
 
   // ---- Darling in the Franxx ----
-  'Zero Two':       { img: 'images/zero-two.jpg',       anime: 'Darling in the FranXX' },
+  'Zero Two':       { img: 'images/Zero Two.jpg',       anime: 'Darling in the FranXX' },
 
   // ---- Spy x Family ----
-  'Yor Forger':     { img: 'images/yor.jpg',            anime: 'Spy x Family' },
+  'Yor Forger':     { img: 'images/Yor Forger.jpg',            anime: 'Spy x Family' },
 
   // ---- Chainsaw Man ----
-  'Makima':         { img: 'images/makima.jpg',         anime: 'Chainsaw Man' },
+  'Makima':         { img: 'images/Makima.jpg',         anime: 'Chainsaw Man' },
 
   // ---- Naruto (female) ----
-  'Hinata Hyuga':   { img: 'images/hinata.jpg',         anime: 'Naruto' },
-  'Sakura Haruno':  { img: 'images/sakura.jpg',         anime: 'Naruto' },
-  'Tsunade':        { img: 'images/tsunade.jpg',        anime: 'Naruto' },
+  'Hinata Hyuga':   { img: 'images/Hinata Hyuga.jpg',         anime: 'Naruto' },
+  'Sakura Haruno':  { img: 'images/Sakura Haruno.jpg',         anime: 'Naruto' },
+  'Tsunade':        { img: 'images/Tsunade.jpg',        anime: 'Naruto' },
 
   // ---- My Hero Academia ----
-  'Toga Himiko':    { img: 'images/toga.jpg',           anime: 'My Hero Academia' },
+  'Toga Himiko':    { img: 'images/Toga Himiko.jpg',           anime: 'My Hero Academia' },
 
   // ---- Akame ga Kill ----
-  'Esdeath':        { img: 'images/esdeath.jpg',        anime: 'Akame ga Kill' },
+  'Esdeath':        { img: 'images/Esdeath.jpg',        anime: 'Akame ga Kill' },
 
   // ---- Bleach ----
-  'Orihime Inoue':  { img: 'images/orihime.jpg',        anime: 'Bleach' },
+  'Orihime Inoue':  { img: 'images/Orihime Inoue.jpg',        anime: 'Bleach' },
 
   // ---- Pokémon ----
-  'Serena':         { img: 'images/serena.jpg',         anime: 'Pokémon' },
+  'Serena':         { img: 'images/Serena.jpg',         anime: 'Pokémon' },
 };
