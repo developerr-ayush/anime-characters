@@ -1,4 +1,4 @@
-import { eyesSources, chars, qbankQuestions, QBANK_CATEGORIES } from './data.js';
+import { EYES_FOLDER, chars, qbankQuestions, QBANK_CATEGORIES } from './data.js';
 
 // ============= STATE =============
 let activeTrios      = [];
@@ -13,6 +13,8 @@ const gameEl            = document.getElementById('game');
 const summaryEl        = document.getElementById('summary');
 const eyesScreenEl     = document.getElementById('eyes-screen');
 const eyesSummaryEl    = document.getElementById('eyes-summary');
+const tinderScreenEl   = document.getElementById('tinder-screen');
+const tinderSummaryEl  = document.getElementById('tinder-summary');
 const charactersEl     = document.getElementById('characters');
 const zonesEls         = document.querySelectorAll('.zone');
 const modeTitleEl      = document.getElementById('modeTitle');
@@ -59,18 +61,24 @@ const preloadImage = (src) => {
   });
 };
 
+function eyesImagePaths(name) {
+  const base = EYES_FOLDER.split('/').map(encodeURIComponent).join('/');
+  return {
+    eye:  `${base}/${encodeURIComponent('Eye ' + name + '.png')}`,
+    face: `${base}/${encodeURIComponent(name + ' (2).png')}`,
+  };
+}
+
 function collectAllImageUrls() {
   const urls = new Set();
   Object.values(chars).forEach(c => {
     const src = safeImg(c?.img);
     if (src) urls.add(src);
   });
-  eyesSources.forEach(src => {
-    const base = src.folder.split('/').map(encodeURIComponent).join('/');
-    const total = src.pairCount * 2;
-    for (let i = 1; i <= total; i++) {
-      urls.add(`${base}/${i}.jpg`);
-    }
+  Object.keys(chars).forEach(name => {
+    const { eye, face } = eyesImagePaths(name);
+    urls.add(eye);
+    urls.add(face);
   });
   return [...urls];
 }
@@ -87,6 +95,8 @@ function showScreen(screen) {
   summaryEl.classList.add('hidden');
   eyesScreenEl.classList.add('hidden');
   eyesSummaryEl.classList.add('hidden');
+  tinderScreenEl.classList.add('hidden');
+  tinderSummaryEl.classList.add('hidden');
   qbankEl.classList.add('hidden');
   screen.classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -100,6 +110,7 @@ function showHome() {
 document.getElementById('dmkStartBtn').addEventListener('click', startDMK);
 document.getElementById('eyesStartBtn').addEventListener('click', startEyesGame);
 document.getElementById('qbankStartBtn').addEventListener('click', startQbank);
+document.getElementById('tinderStartBtn').addEventListener('click', startTinder);
 
 // ============= START DATE · MARRY · KILL =============
 const DMK_ROUNDS = 6;
@@ -431,11 +442,17 @@ let eyesIdx        = 0;
 let eyesGot        = 0;
 let eyesMissed     = 0;
 let eyesRevealed   = false;
+let eyesHintUsed   = false;
 
 const eyesCounterEl  = document.getElementById('eyesCounter');
 const eyesProgressEl = document.getElementById('eyesProgress');
 const eyesGotEl      = document.getElementById('eyesGotScore');
 const eyesMissedEl   = document.getElementById('eyesMissedScore');
+const eyesMysteryTextEl = document.getElementById('eyesMysteryText');
+const hintBtn        = document.getElementById('hintBtn');
+const eyesCardEl     = document.getElementById('eyesCard');
+const stampGotEl     = document.getElementById('stampGot');
+const stampMissedEl  = document.getElementById('stampMissed');
 const eyesLayerEl    = document.getElementById('eyesLayer');
 const faceLayerEl    = document.getElementById('faceLayer');
 const eyesImgEl      = document.getElementById('eyesImg');
@@ -455,13 +472,7 @@ const eyesSummaryScoreEl = document.getElementById('eyesSummaryScore');
 const eyesSummaryEmojiEl = document.getElementById('eyesSummaryEmoji');
 
 function buildEyesPool() {
-  const allPairs = [];
-  eyesSources.forEach(src => {
-    const base = src.folder.split('/').map(encodeURIComponent).join('/');
-    for (let i = 0; i < src.pairCount; i++) {
-      allPairs.push({ eye: `${base}/${i * 2 + 1}.jpg`, face: `${base}/${i * 2 + 2}.jpg` });
-    }
-  });
+  const allPairs = Object.keys(chars).map(name => ({ name, ...eyesImagePaths(name) }));
   return shuffle(allPairs).slice(0, EYES_ROUNDS);
 }
 
@@ -488,12 +499,30 @@ function renderEyesCard() {
   eyesImgEl.src = pair.eye;
   faceImgEl.src = pair.face;
 
-  // Reset reveal state
+  // Reset reveal + hint state
   eyesRevealed = false;
+  eyesHintUsed = false;
+  eyesMysteryTextEl.textContent = '👁️ Who is this?';
+  hintBtn.disabled = false;
   eyesLayerEl.classList.remove('hidden');
   faceLayerEl.classList.add('hidden');
   preRevealEl.classList.remove('hidden');
   postRevealEl.classList.add('hidden');
+
+  // Reset any leftover swipe transform/stamps from the previous card
+  eyesCardEl.style.transition = 'none';
+  eyesCardEl.style.transform  = '';
+  stampGotEl.style.opacity    = '0';
+  stampMissedEl.style.opacity = '0';
+}
+
+function showHint() {
+  if (eyesHintUsed || eyesRevealed) return;
+  eyesHintUsed = true;
+  const pair = activeEyesPairs[eyesIdx];
+  eyesMysteryTextEl.textContent = `🎬 ${chars[pair.name]?.anime ?? '?'}`;
+  hintBtn.disabled = true;
+  vibrate(8);
 }
 
 function revealEyes() {
@@ -532,6 +561,56 @@ function scoreEyes(got) {
   }
 }
 
+// ============= SWIPE TO SCORE (Tinder-style) =============
+// Only active once the card is revealed — dragging the eye-only card
+// would be ambiguous (that's what the Reveal button is for).
+let swipeStartX  = null;
+let swipeDeltaX  = 0;
+const SWIPE_THRESHOLD = 90;
+
+function onSwipeMove(clientX) {
+  if (swipeStartX === null) return;
+  swipeDeltaX = clientX - swipeStartX;
+  const rotate = swipeDeltaX / 18;
+  eyesCardEl.style.transform = `translateX(${swipeDeltaX}px) rotate(${rotate}deg)`;
+  const pull = Math.min(Math.abs(swipeDeltaX) / SWIPE_THRESHOLD, 1);
+  stampGotEl.style.opacity    = swipeDeltaX > 0 ? String(pull) : '0';
+  stampMissedEl.style.opacity = swipeDeltaX < 0 ? String(pull) : '0';
+}
+
+function endSwipe() {
+  if (swipeStartX === null) return;
+  eyesCardEl.style.transition = 'transform 0.25s ease';
+
+  if (swipeDeltaX > SWIPE_THRESHOLD) {
+    eyesCardEl.style.transform = `translateX(700px) rotate(24deg)`;
+    setTimeout(() => scoreEyes(true), 180);
+  } else if (swipeDeltaX < -SWIPE_THRESHOLD) {
+    eyesCardEl.style.transform = `translateX(-700px) rotate(-24deg)`;
+    setTimeout(() => scoreEyes(false), 180);
+  } else {
+    eyesCardEl.style.transform = '';
+    stampGotEl.style.opacity    = '0';
+    stampMissedEl.style.opacity = '0';
+  }
+  swipeStartX = null;
+  swipeDeltaX = 0;
+}
+
+eyesCardEl.addEventListener('pointerdown', e => {
+  if (!eyesRevealed) return;
+  e.preventDefault(); // stop the browser's native image-drag ghost preview
+  swipeStartX = e.clientX;
+  eyesCardEl.style.transition = 'none';
+  eyesCardEl.setPointerCapture(e.pointerId);
+});
+eyesCardEl.addEventListener('pointermove', e => {
+  if (!eyesRevealed) return;
+  onSwipeMove(e.clientX);
+});
+eyesCardEl.addEventListener('pointerup', endSwipe);
+eyesCardEl.addEventListener('pointercancel', endSwipe);
+
 function showEyesSummary() {
   eyesProgressEl.style.width = '100%';
   const total    = activeEyesPairs.length;
@@ -549,11 +628,136 @@ function showEyesSummary() {
 }
 
 revealBtn.addEventListener('click', revealEyes);
+hintBtn.addEventListener('click', showHint);
 gotItBtn.addEventListener('click', () => scoreEyes(true));
 missedBtn.addEventListener('click', () => scoreEyes(false));
 eyesBackBtn.addEventListener('click', showHome);
 eyesHomeBtn.addEventListener('click', showHome);
 eyesPlayAgainBtn.addEventListener('click', startEyesGame);
+
+// ============= ANIME TINDER =============
+// Reuses the exact same vertical "reveal" cards from the Eyes game — they're
+// already framed as name+anime cards, perfect for a swipe deck as-is.
+const TINDER_ROUNDS = 20;
+
+let tinderDeck    = [];
+let tinderIdx     = 0;
+let tinderMatches = [];
+
+const tinderCounterEl  = document.getElementById('tinderCounter');
+const tinderProgressEl = document.getElementById('tinderProgress');
+const tinderCardEl     = document.getElementById('tinderCard');
+const tinderImgEl      = document.getElementById('tinderImg');
+const tinderStampPassEl  = document.getElementById('tinderStampPass');
+const tinderStampSmashEl = document.getElementById('tinderStampSmash');
+const tinderPassBtn    = document.getElementById('tinderPassBtn');
+const tinderSmashBtn   = document.getElementById('tinderSmashBtn');
+const tinderBackBtn    = document.getElementById('tinderBackBtn');
+const tinderHomeBtn    = document.getElementById('tinderHomeBtn');
+const tinderPlayAgainBtn = document.getElementById('tinderPlayAgainBtn');
+const tinderSummaryScoreEl = document.getElementById('tinderSummaryScore');
+const tinderMatchesGridEl  = document.getElementById('tinderMatchesGrid');
+
+function startTinder() {
+  tinderDeck    = shuffle(Object.keys(chars)).slice(0, TINDER_ROUNDS);
+  tinderIdx     = 0;
+  tinderMatches = [];
+  showScreen(tinderScreenEl);
+  renderTinderCard();
+}
+
+function renderTinderCard() {
+  const name = tinderDeck[tinderIdx];
+  tinderCounterEl.textContent  = `${tinderIdx + 1} / ${tinderDeck.length}`;
+  tinderProgressEl.style.width = `${(tinderIdx / tinderDeck.length) * 100}%`;
+  tinderImgEl.src = eyesImagePaths(name).face;
+
+  tinderCardEl.style.transition = 'none';
+  tinderCardEl.style.transform  = '';
+  tinderStampSmashEl.style.opacity = '0';
+  tinderStampPassEl.style.opacity  = '0';
+}
+
+function judgeTinder(smash) {
+  const name = tinderDeck[tinderIdx];
+  if (smash) tinderMatches.push(name);
+
+  vibrate(smash ? [10, 30, 10] : [20]);
+
+  tinderIdx++;
+  if (tinderIdx >= tinderDeck.length) {
+    showTinderSummary();
+  } else {
+    renderTinderCard();
+  }
+}
+
+function showTinderSummary() {
+  tinderProgressEl.style.width = '100%';
+  tinderSummaryScoreEl.textContent = `You matched with ${tinderMatches.length} out of ${tinderDeck.length}`;
+
+  tinderMatchesGridEl.innerHTML = tinderMatches.length === 0
+    ? `<div class="col-span-3 text-center py-11 px-5 text-ink-faint text-sm">
+        <span class="block text-4xl mb-3">💔</span>
+        No matches this round — everyone got the pass.
+      </div>`
+    : tinderMatches.map(name => `
+        <div class="relative rounded-xl overflow-hidden bg-surface border border-white/10 aspect-[9/16]">
+          <img class="w-full h-full object-cover" src="${eyesImagePaths(name).face}" alt="${name}">
+        </div>
+      `).join('');
+
+  showScreen(tinderSummaryEl);
+}
+
+// Swipe to judge — active immediately, no reveal step (unlike Eyes game).
+let tinderSwipeStartX = null;
+let tinderSwipeDeltaX = 0;
+
+function onTinderSwipeMove(clientX) {
+  if (tinderSwipeStartX === null) return;
+  tinderSwipeDeltaX = clientX - tinderSwipeStartX;
+  const rotate = tinderSwipeDeltaX / 18;
+  tinderCardEl.style.transform = `translateX(${tinderSwipeDeltaX}px) rotate(${rotate}deg)`;
+  const pull = Math.min(Math.abs(tinderSwipeDeltaX) / SWIPE_THRESHOLD, 1);
+  tinderStampSmashEl.style.opacity = tinderSwipeDeltaX > 0 ? String(pull) : '0';
+  tinderStampPassEl.style.opacity  = tinderSwipeDeltaX < 0 ? String(pull) : '0';
+}
+
+function endTinderSwipe() {
+  if (tinderSwipeStartX === null) return;
+  tinderCardEl.style.transition = 'transform 0.25s ease';
+
+  if (tinderSwipeDeltaX > SWIPE_THRESHOLD) {
+    tinderCardEl.style.transform = `translateX(700px) rotate(24deg)`;
+    setTimeout(() => judgeTinder(true), 180);
+  } else if (tinderSwipeDeltaX < -SWIPE_THRESHOLD) {
+    tinderCardEl.style.transform = `translateX(-700px) rotate(-24deg)`;
+    setTimeout(() => judgeTinder(false), 180);
+  } else {
+    tinderCardEl.style.transform = '';
+    tinderStampSmashEl.style.opacity = '0';
+    tinderStampPassEl.style.opacity  = '0';
+  }
+  tinderSwipeStartX = null;
+  tinderSwipeDeltaX = 0;
+}
+
+tinderCardEl.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  tinderSwipeStartX = e.clientX;
+  tinderCardEl.style.transition = 'none';
+  tinderCardEl.setPointerCapture(e.pointerId);
+});
+tinderCardEl.addEventListener('pointermove', e => onTinderSwipeMove(e.clientX));
+tinderCardEl.addEventListener('pointerup', endTinderSwipe);
+tinderCardEl.addEventListener('pointercancel', endTinderSwipe);
+
+tinderPassBtn.addEventListener('click', () => judgeTinder(false));
+tinderSmashBtn.addEventListener('click', () => judgeTinder(true));
+tinderBackBtn.addEventListener('click', showHome);
+tinderHomeBtn.addEventListener('click', showHome);
+tinderPlayAgainBtn.addEventListener('click', startTinder);
 
 // ============= KEYBOARD SHORTCUTS =============
 document.addEventListener('keydown', e => {
@@ -572,9 +776,16 @@ document.addEventListener('keydown', e => {
 
   // Eyes game shortcuts
   if (!eyesScreenEl.classList.contains('hidden')) {
+    if (key === 'h' && !eyesRevealed) { showHint(); return; }
     if (key === 'r' && !eyesRevealed) { revealEyes(); return; }
     if (key === 'g' && eyesRevealed)  { scoreEyes(true); return; }
     if (key === 'm' && eyesRevealed)  { scoreEyes(false); return; }
+  }
+
+  // Anime Tinder shortcuts
+  if (!tinderScreenEl.classList.contains('hidden')) {
+    if (key === 's' || key === 'arrowright') { judgeTinder(true); return; }
+    if (key === 'p' || key === 'arrowleft')  { judgeTinder(false); return; }
   }
 
   // DMK game shortcuts

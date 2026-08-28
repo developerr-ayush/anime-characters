@@ -57,6 +57,14 @@
                     </div>
                     <div class="text-ink-faint shrink-0">→</div>
                 </button>
+                <button class="mode-card relative rounded-2xl p-4 bg-surface border border-white/10 cursor-pointer transition-colors duration-150 text-left flex items-center gap-3.5 active:scale-[0.98] anim-card-enter" style="animation-delay:0.14s" id="tinderStartBtn" type="button">
+                    <div class="text-3xl leading-none shrink-0">🔥</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-base font-bold text-ink leading-tight">Anime Tinder</div>
+                        <div class="text-xs text-ink-dim leading-snug mt-0.5">Smash or pass — swipe right or left</div>
+                    </div>
+                    <div class="text-ink-faint shrink-0">→</div>
+                </button>
             </div>
         </div>
 
@@ -153,20 +161,21 @@
                 </div>
             </div>
 
-            <!-- The reveal card -->
+            <!-- The reveal card — source images are native 9:16 "quiz card" crops -->
             <div class="flex-1 flex justify-center">
-                <div class="w-full max-w-[360px] min-[600px]:max-w-[320px] aspect-square min-[600px]:aspect-[3/4] rounded-2xl overflow-hidden relative bg-surface border border-white/10" id="eyesCard">
+                <div class="w-[72vw] max-w-[300px] aspect-[9/16] rounded-2xl overflow-hidden relative bg-surface border border-white/10" id="eyesCard">
                     <!-- Eye image layer -->
                     <div class="absolute inset-0" id="eyesLayer">
                         <img class="w-full h-full object-cover" id="eyesImg" src="" alt="Guess the character">
-                        <div class="absolute inset-0 flex items-end justify-center pb-5 pointer-events-none" style="background: linear-gradient(to bottom, transparent 45%, rgba(8,6,15,0.75) 100%)">
-                            <span class="text-sm font-semibold text-white/80 bg-black/40 px-4 py-1.5 rounded-full">👁️ Who is this?</span>
+                        <div class="absolute inset-0 flex items-end justify-center pb-5 pointer-events-none">
+                            <span class="text-sm font-semibold text-white/80 bg-black/40 px-4 py-1.5 rounded-full" id="eyesMysteryText">👁️ Who is this?</span>
                         </div>
                     </div>
-                    <!-- Face reveal layer (hidden until reveal) -->
+                    <!-- Face reveal layer (hidden until reveal) — name/anime are already baked into the image -->
                     <div class="hidden absolute inset-0 anim-reveal-face" id="faceLayer">
-                        <img class="w-full h-full object-cover" id="faceImg" src="" alt="Revealed character">
-                        <div class="absolute top-3 right-3 bg-black/55 text-green text-[11px] font-bold px-3 py-1 rounded-full">Revealed!</div>
+                        <img class="w-full h-full object-cover pointer-events-none" id="faceImg" src="" alt="Revealed character" draggable="false">
+                        <div class="absolute top-6 left-6 px-3 py-1 rounded-lg border-[3px] border-red text-red font-black text-xl uppercase -rotate-12 opacity-0 pointer-events-none" id="stampMissed">Nope</div>
+                        <div class="absolute top-6 right-6 px-3 py-1 rounded-lg border-[3px] border-green text-green font-black text-xl uppercase rotate-12 opacity-0 pointer-events-none" id="stampGot">Got it</div>
                     </div>
                 </div>
             </div>
@@ -174,16 +183,21 @@
             <!-- Controls -->
             <div class="flex flex-col gap-2.5 sticky bottom-0 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] -mx-4 px-4"
                  style="background: linear-gradient(to top, rgba(8,6,15,0.98) 65%, transparent)">
-                <div id="preReveal">
-                    <button class="btn w-full py-3.5 rounded-xl bg-pink text-white font-bold text-sm shadow-[0_6px_20px_rgba(255,45,120,0.25)] transition-transform duration-150 active:scale-[0.96]" id="revealBtn">
+                <div id="preReveal" class="flex gap-2.5">
+                    <button class="btn flex-none px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-ink-dim font-bold text-sm transition-colors duration-150 active:scale-[0.96] hover:bg-white/10 hover:text-ink disabled:opacity-30 disabled:pointer-events-none" id="hintBtn">💡 Hint</button>
+                    <button class="btn flex-1 py-3.5 rounded-xl bg-pink text-white font-bold text-sm shadow-[0_6px_20px_rgba(255,45,120,0.25)] transition-transform duration-150 active:scale-[0.96]" id="revealBtn">
                         <span>👁️ Reveal</span>
                     </button>
                 </div>
-                <div id="postReveal" class="hidden flex gap-2.5">
-                    <button class="btn btn-miss flex-1 px-5 py-3 rounded-xl font-bold text-sm transition-transform duration-150 active:scale-[0.96]" id="missedBtn">✗ Missed it</button>
-                    <button class="btn btn-got flex-1 px-5 py-3 rounded-xl font-bold text-sm transition-transform duration-150 active:scale-[0.96]" id="gotItBtn">✓ Got it!</button>
+                <div id="postReveal" class="hidden flex flex-col gap-1.5">
+                    <div class="flex gap-2.5">
+                        <button class="btn btn-miss flex-1 px-5 py-3 rounded-xl font-bold text-sm transition-transform duration-150 active:scale-[0.96]" id="missedBtn">✗ Missed it</button>
+                        <button class="btn btn-got flex-1 px-5 py-3 rounded-xl font-bold text-sm transition-transform duration-150 active:scale-[0.96]" id="gotItBtn">✓ Got it!</button>
+                    </div>
+                    <p class="text-center text-ink-faint text-[11px]">or swipe the card ← →</p>
                 </div>
                 <p class="hidden [@media(hover:hover)_and_(pointer:fine)]:block text-center text-ink-faint text-xs pt-1">
+                    <kbd class="inline-block px-1.5 py-px rounded-md bg-white/5 border border-white/10 text-[11px] text-ink-dim mx-px">H</kbd> hint ·
                     <kbd class="inline-block px-1.5 py-px rounded-md bg-white/5 border border-white/10 text-[11px] text-ink-dim mx-px">R</kbd> reveal ·
                     <kbd class="inline-block px-1.5 py-px rounded-md bg-white/5 border border-white/10 text-[11px] text-ink-dim mx-px">G</kbd> got it ·
                     <kbd class="inline-block px-1.5 py-px rounded-md bg-white/5 border border-white/10 text-[11px] text-ink-dim mx-px">M</kbd> missed
@@ -212,6 +226,52 @@
             <div class="flex justify-center gap-2.5 pt-4">
                 <button class="btn flex-none px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-ink-dim font-semibold text-sm transition-colors duration-150 active:scale-[0.96] hover:bg-white/10 hover:text-ink" id="eyesPlayAgainBtn">↺ Play Again</button>
                 <button class="btn flex-none px-8 py-3 rounded-xl bg-pink text-white font-bold text-sm shadow-[0_6px_20px_rgba(255,45,120,0.25)] transition-transform duration-150 active:scale-[0.96]" id="eyesHomeBtn">← Home</button>
+            </div>
+        </div>
+
+        <!-- ===== ANIME TINDER SCREEN ===== -->
+        <div id="tinder-screen" class="hidden flex flex-col gap-4 anim-section-enter">
+
+            <header class="text-center">
+                <button class="inline-flex items-center gap-1 min-h-9 px-3.5 bg-white/5 border border-white/10 text-ink-dim text-xs font-semibold rounded-full mb-3 transition-colors duration-150 hover:bg-white/10 hover:text-ink" id="tinderBackBtn">← Home</button>
+                <div class="text-lg font-bold tracking-tight text-ink mb-2.5">🔥 Anime Tinder</div>
+                <div class="flex items-center justify-center gap-2.5 mb-3 flex-wrap">
+                    <span class="text-xs text-ink-faint font-medium" id="tinderCounter">1 / 20</span>
+                </div>
+                <div class="h-1 max-w-[160px] mx-auto bg-white/10 rounded-full overflow-hidden">
+                    <div class="progress-fill h-full rounded-full transition-[width] duration-500 ease-snap" id="tinderProgress" style="width:0%"></div>
+                </div>
+            </header>
+
+            <div class="flex-1 flex justify-center">
+                <div class="w-[72vw] max-w-[300px] aspect-[9/16] rounded-2xl overflow-hidden relative bg-surface border border-white/10" id="tinderCard">
+                    <img class="w-full h-full object-cover pointer-events-none" id="tinderImg" src="" alt="Smash or pass" draggable="false">
+                    <div class="absolute top-6 left-6 px-3 py-1 rounded-lg border-[3px] border-red text-red font-black text-xl uppercase -rotate-12 opacity-0 pointer-events-none" id="tinderStampPass">Pass</div>
+                    <div class="absolute top-6 right-6 px-3 py-1 rounded-lg border-[3px] border-green text-green font-black text-xl uppercase rotate-12 opacity-0 pointer-events-none" id="tinderStampSmash">Smash</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5 sticky bottom-0 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] -mx-4 px-4"
+                 style="background: linear-gradient(to top, rgba(8,6,15,0.98) 65%, transparent)">
+                <div class="flex gap-2.5">
+                    <button class="btn btn-miss flex-1 px-5 py-3.5 rounded-xl font-bold text-sm transition-transform duration-150 active:scale-[0.96]" id="tinderPassBtn">✗ Pass</button>
+                    <button class="btn btn-got flex-1 px-5 py-3.5 rounded-xl font-bold text-sm transition-transform duration-150 active:scale-[0.96]" id="tinderSmashBtn">🔥 Smash</button>
+                </div>
+                <p class="text-center text-ink-faint text-[11px]">or swipe the card ← →</p>
+            </div>
+
+        </div>
+
+        <!-- ===== ANIME TINDER SUMMARY ===== -->
+        <div id="tinder-summary" class="hidden pb-8 anim-section-enter">
+            <div class="text-center pt-1 pb-7">
+                <h2 class="text-[clamp(1.6rem,6vw,2.2rem)] font-extrabold tracking-[-0.02em] leading-[1.15] text-ink">Your Matches</h2>
+                <p class="text-sm text-ink-dim mt-2" id="tinderSummaryScore">You matched with 0 out of 0</p>
+            </div>
+            <div class="grid grid-cols-3 gap-2.5" id="tinderMatchesGrid"></div>
+            <div class="flex justify-center gap-2.5 pt-6">
+                <button class="btn flex-none px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-ink-dim font-semibold text-sm transition-colors duration-150 active:scale-[0.96] hover:bg-white/10 hover:text-ink" id="tinderPlayAgainBtn">↺ Play Again</button>
+                <button class="btn flex-none px-8 py-3 rounded-xl bg-pink text-white font-bold text-sm shadow-[0_6px_20px_rgba(255,45,120,0.25)] transition-transform duration-150 active:scale-[0.96]" id="tinderHomeBtn">← Home</button>
             </div>
         </div>
 
