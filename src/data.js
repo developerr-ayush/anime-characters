@@ -100,12 +100,12 @@ export const chars = {
   'Light Yagami': { img: 'images/Light Yagami.jpg', anime: 'Death Note' },
 
   // ---- Re:Zero ----
-  'Rem': { img: 'images/Rem.jpg', anime: 'Re:Zero' },
-  'Ram': { img: 'images/Ram.jpg', anime: 'Re:Zero' },
-  'Emilia': { img: 'images/Emilia.jpg', anime: 'Re:Zero' },
+  'Rem': { img: 'images/Rem Rezero.jpg', anime: 'Re:Zero' },
+  'Ram': { img: 'images/Ram Rezero.jpg', anime: 'Re:Zero' },
+  'Emilia': { img: 'images/Emilia Rezero.jpg', anime: 'Re:Zero' },
 
   // ---- Demon Slayer ----
-  'Nezuko Kamado': { img: 'images/nezuko kamado.jpg', anime: 'Demon Slayer' },
+  'Nezuko Kamado': { img: 'images/Nezuko Kamado.jpg', anime: 'Demon Slayer' },
   'Zenitsu Agatsuma': { img: 'images/Zenitsu.jpg', anime: 'Demon Slayer' },
   'Inosuke Hashibira': { img: 'images/inosuke.png', anime: 'Demon Slayer' },
   'Giyuu Tomioka': { img: 'images/Giyuu.jpg', anime: 'Demon Slayer' },
@@ -126,24 +126,24 @@ export const chars = {
   'Yor Forger': { img: 'images/Yor Forger.jpg', anime: 'Spy x Family' },
 
   // ---- Chainsaw Man ----
-  'Makima': { img: 'images/Makima.jpg', anime: 'Chainsaw Man' },
+  'Makima': { img: 'images/Makima CSM.jpg', anime: 'Chainsaw Man' },
 
   // ---- Naruto (female) ----
   'Hinata Hyuga': { img: 'images/Hinata.jpg', anime: 'Naruto' },
   'Sakura Haruno': { img: 'images/Sakura Haruno.jpg', anime: 'Naruto' },
-  'Tsunade': { img: 'images/Tsunade.jpg', anime: 'Naruto' },
+  'Tsunade': { img: 'images/Tsunade Naruto.jpg', anime: 'Naruto' },
 
   // ---- My Hero Academia ----
   'Toga Himiko': { img: 'images/Toga Himiko.jpg', anime: 'My Hero Academia' },
 
   // ---- Akame ga Kill ----
-  'Esdeath': { img: 'images/Esdeath.jpg', anime: 'Akame ga Kill' },
+  'Esdeath': { img: 'images/Esdeath AGK.jpg', anime: 'Akame ga Kill' },
 
   // ---- Bleach ----
   'Orihime Inoue': { img: 'images/Orihime Inoue.jpg', anime: 'Bleach' },
 
   // ---- Pokémon ----
-  'Serena': { img: 'images/Serena.jpg', anime: 'Pokémon' },
+  'Serena': { img: 'images/Serena Pokemon.jpg', anime: 'Pokémon' },
 
   // ---- Dragon Ball ----
   'Goku': { img: 'images/Goku.jpg', anime: 'Dragon Ball Z' },
@@ -176,7 +176,7 @@ export const chars = {
   'Reze': { img: 'images/Reze.jpg', anime: 'Chainsaw Man' },
 
   // ---- Mushoku Tensei ----
-  'Rudeus Greyrat': { img: 'images/𝙍𝙪𝙙𝙚𝙪𝙨 𝙂𝙧𝙚𝙮𝙧𝙖𝙩.jpg', anime: 'Mushoku Tensei' },
+  'Rudeus Greyrat': { img: 'images/Rudeus Greyrat.jpg', anime: 'Mushoku Tensei' },
   'Roxy Migurdia': { img: 'images/Roxy Migurdia.jpg', anime: 'Mushoku Tensei' },
   'Sylphiette': { img: 'images/Sylphiette.jpg', anime: 'Mushoku Tensei' },
 
@@ -196,7 +196,7 @@ export const chars = {
   'Sung Jin-Woo': { img: 'images/Sung Jin Woo.jpg', anime: 'Solo Leveling' },
 
   // ---- Your Lie in April ----
-  'Kousei Arima': { img: 'images/Kōsei Arima.jpg', anime: 'Your Lie in April' },
+  'Kousei Arima': { img: 'images/Kousei Arima.jpg', anime: 'Your Lie in April' },
 
   // ---- The Apothecary Diaries ----
   'Maomao': { img: 'images/Maomao.jpg', anime: 'The Apothecary Diaries' },
