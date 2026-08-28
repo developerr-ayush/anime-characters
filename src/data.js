@@ -4,7 +4,7 @@
 export const EYES_FOLDER = 'Anime Characters By Their Eyes Random';
 
 // ============= QUESTION BANK =============
-export const QBANK_CATEGORIES = ['All', 'Controversial', 'Power Scaling', 'Industry', 'General'];
+export const QBANK_CATEGORIES = ['All', 'Power Scaling', 'Best Girl/Boy', 'Ships', 'Character Debate', 'Isekai', 'Fan Culture', 'Overrated/Underrated', 'General', 'Would You Rather'];
 
 export const qbankQuestions = [
   { id: 1, text: 'Naruto vs Bleach — who wins?', category: 'Power Scaling', viral: true },
@@ -108,7 +108,7 @@ export const chars = {
   'Nezuko Kamado': { img: 'images/nezuko kamado.jpg', anime: 'Demon Slayer' },
   'Zenitsu Agatsuma': { img: 'images/Zenitsu.jpg', anime: 'Demon Slayer' },
   'Inosuke Hashibira': { img: 'images/inosuke.png', anime: 'Demon Slayer' },
-  'Giyuu Tomioka': { img: 'images/𝐓𝐨𝐦𝐢𝐨𝐤𝐚 𝐆𝐢𝐲𝐮𝐮.jpg', anime: 'Demon Slayer' },
+  'Giyuu Tomioka': { img: 'images/Giyuu.jpg', anime: 'Demon Slayer' },
   'Kyojuro Rengoku': { img: 'images/Kyojuro Rengoku.webp', anime: 'Demon Slayer' },
   'Shinobu Kocho': { img: 'images/Shinobu Kocho.jpg', anime: 'Demon Slayer' },
   'Mitsuri Kanroji': { img: 'images/KANROJI MITSURI.jpg', anime: 'Demon Slayer' },
