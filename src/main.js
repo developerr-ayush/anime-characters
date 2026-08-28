@@ -598,7 +598,7 @@ function endSwipe() {
 }
 
 eyesCardEl.addEventListener('pointerdown', e => {
-  if (!eyesRevealed) return;
+  if (!eyesRevealed || !e.isPrimary) return;
   e.preventDefault(); // stop the browser's native image-drag ghost preview
   swipeStartX = e.clientX;
   eyesCardEl.style.transition = 'none';
@@ -744,6 +744,7 @@ function endTinderSwipe() {
 }
 
 tinderCardEl.addEventListener('pointerdown', e => {
+  if (!e.isPrimary) return;
   e.preventDefault();
   tinderSwipeStartX = e.clientX;
   tinderCardEl.style.transition = 'none';

@@ -39,6 +39,21 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ============================================
+   SWIPE CARDS (Tinder-style) — without this,
+   mobile browsers treat a horizontal drag as an
+   ambiguous scroll gesture and can cancel the
+   pointer sequence mid-swipe (pointercancel),
+   which is what "loses" the swipe on phones.
+   ============================================ */
+#eyesCard,
+#tinderCard {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
 .hidden { display: none !important; }
 button:not(:disabled) { cursor: pointer; }
 
