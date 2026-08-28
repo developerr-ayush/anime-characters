@@ -1,8 +1,7 @@
-import { gameModes, eyesPacks, chars, qbankQuestions, QBANK_CATEGORIES } from './data.js';
+import { eyesSources, chars, qbankQuestions, QBANK_CATEGORIES } from './data.js';
 
 // ============= STATE =============
 let activeTrios      = [];
-let activeMode       = null;
 let currentTrioIdx   = 0;
 const placements     = {};
 let trioPlacements   = {};
@@ -10,11 +9,10 @@ let selectedCard     = null;
 
 // ============= ELEMENTS =============
 const homeEl           = document.getElementById('home');
-const gameEl           = document.getElementById('game');
+const gameEl            = document.getElementById('game');
 const summaryEl        = document.getElementById('summary');
 const eyesScreenEl     = document.getElementById('eyes-screen');
 const eyesSummaryEl    = document.getElementById('eyes-summary');
-const modeGridEl       = document.getElementById('modeGrid');
 const charactersEl     = document.getElementById('characters');
 const zonesEls         = document.querySelectorAll('.zone');
 const modeTitleEl      = document.getElementById('modeTitle');
@@ -36,6 +34,18 @@ const initialsOf = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2)
 const safeImg    = (src)  => src ? encodeURI(src) : null;
 const vibrate    = (ms = 14) => { try { navigator.vibrate?.(ms); } catch {} };
 
+const AVATAR_GRADIENT = 'background: var(--color-surface-2)';
+const TEXT_SHADOW_SOFT = 'text-shadow: 0 1px 8px rgba(0,0,0,0.8)';
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 const preloadedImages = new Set();
 
 const preloadImage = (src) => {
@@ -55,9 +65,9 @@ function collectAllImageUrls() {
     const src = safeImg(c?.img);
     if (src) urls.add(src);
   });
-  eyesPacks.forEach(pack => {
-    const base = pack.folder.split('/').map(encodeURIComponent).join('/');
-    const total = pack.pairCount * 2;
+  eyesSources.forEach(src => {
+    const base = src.folder.split('/').map(encodeURIComponent).join('/');
+    const total = src.pairCount * 2;
     for (let i = 1; i <= total; i++) {
       urls.add(`${base}/${i}.jpg`);
     }
@@ -68,18 +78,6 @@ function collectAllImageUrls() {
 function preloadAllImages() {
   const urls = collectAllImageUrls();
   return Promise.all(urls.map(preloadImage));
-}
-
-function tagClass(tag) {
-  const map = {
-    'Male':      'tag-male',
-    'Female':    'tag-female',
-    'Mix':       'tag-mix',
-    'Heroes':    'tag-heroes',
-    'Villains':  'tag-villains',
-    'Fan Favs':  'tag-fan-favs',
-  };
-  return map[tag] || 'tag-mix';
 }
 
 // ============= SCREEN MANAGEMENT =============
@@ -96,77 +94,34 @@ function showScreen(screen) {
 
 // ============= HOME SCREEN =============
 function showHome() {
-  modeGridEl.innerHTML = `
-    <div class="home-section-label">💕 Date · Marry · Kill</div>
-    ${gameModes.map(mode => {
-      const tagPills = mode.tags.map(t => `<span class="tag-pill ${tagClass(t)}">${t}</span>`).join('');
-      const roundCount = mode.trios.length;
-      return `
-        <button class="mode-card" data-accent="${mode.accent}" data-mode="${mode.id}" data-game="dmk" type="button">
-          <div class="mode-card-emoji">${mode.emoji}</div>
-          <div class="mode-card-title">${mode.title}</div>
-          <div class="mode-card-desc">${mode.description}</div>
-          <div class="mode-card-footer">
-            <div class="tag-pills">${tagPills}</div>
-            <span class="mode-card-rounds">${roundCount} round${roundCount !== 1 ? 's' : ''}</span>
-          </div>
-        </button>
-      `;
-    }).join('')}
-
-    <div class="home-section-label home-section-label--eyes">👁️ Guess by Eyes</div>
-    ${eyesPacks.map(pack => {
-      const tagPills = pack.tags.map(t => `<span class="tag-pill ${tagClass(t)}">${t}</span>`).join('');
-      return `
-        <button class="mode-card" data-accent="${pack.accent}" data-pack="${pack.id}" data-game="eyes" type="button">
-          <div class="mode-card-emoji">${pack.emoji}</div>
-          <div class="mode-card-title">${pack.title}</div>
-          <div class="mode-card-pack-badge">${pack.pack}</div>
-          <div class="mode-card-desc">${pack.description}</div>
-          <div class="mode-card-footer">
-            <div class="tag-pills">${tagPills}</div>
-            <span class="mode-card-rounds">${pack.pairCount} pairs</span>
-          </div>
-        </button>
-      `;
-    }).join('')}
-
-    <div class="home-section-label home-section-label--qbank">📋 Street Interview</div>
-    <button class="mode-card mode-card--wide" data-accent="blue" data-game="qbank" type="button">
-      <div class="mode-card-emoji">🎌</div>
-      <div class="mode-card-title">Comic Con 2026 · Question Bank</div>
-      <div class="mode-card-desc">32 curated anime discussion questions — filter by category, track what's been asked, drag to reorder</div>
-      <div class="mode-card-footer">
-        <div class="tag-pills">
-          <span class="tag-pill tag-villains">Controversial</span>
-          <span class="tag-pill tag-mix">Industry</span>
-          <span class="tag-pill tag-heroes">General</span>
-        </div>
-        <span class="mode-card-rounds">${qbankQuestions.length} questions</span>
-      </div>
-    </button>
-  `;
-
-  modeGridEl.querySelectorAll('[data-game="dmk"]').forEach(card => {
-    card.addEventListener('click', () => startMode(card.dataset.mode));
-  });
-  modeGridEl.querySelectorAll('[data-game="eyes"]').forEach(card => {
-    card.addEventListener('click', () => startEyesPack(card.dataset.pack));
-  });
-  modeGridEl.querySelector('[data-game="qbank"]')
-    .addEventListener('click', startQbank);
-
   showScreen(homeEl);
 }
 
-// ============= START A MODE =============
-function startMode(modeId) {
-  activeMode   = gameModes.find(m => m.id === modeId);
-  activeTrios  = activeMode.trios;
+document.getElementById('dmkStartBtn').addEventListener('click', startDMK);
+document.getElementById('eyesStartBtn').addEventListener('click', startEyesGame);
+document.getElementById('qbankStartBtn').addEventListener('click', startQbank);
+
+// ============= START DATE · MARRY · KILL =============
+const DMK_ROUNDS = 6;
+
+function buildRandomTrios() {
+  const pool = shuffle(Object.keys(chars)).slice(0, DMK_ROUNDS * 3);
+  const trios = [];
+  for (let i = 0; i < pool.length; i += 3) {
+    const characters = pool.slice(i, i + 3);
+    const animes = [...new Set(characters.map(n => chars[n]?.anime).filter(Boolean))];
+    const round = animes.length > 2 ? `${animes.slice(0, 2).join(' × ')} +${animes.length - 2}` : animes.join(' × ');
+    trios.push({ round, characters });
+  }
+  return trios;
+}
+
+function startDMK() {
+  activeTrios    = buildRandomTrios();
   currentTrioIdx = 0;
   Object.keys(placements).forEach(k => delete placements[k]);
 
-  modeTitleEl.textContent = `${activeMode.emoji} ${activeMode.title}`;
+  modeTitleEl.textContent = '💕 Date · Marry · Kill';
   showScreen(gameEl);
   renderTrio();
 }
@@ -175,18 +130,30 @@ function startMode(modeId) {
 function updateHint() {
   const placed = Object.keys(trioPlacements).length;
   if (placed === 3) {
-    hintEl.innerHTML = `<span class="hint-icon">✅</span><span>All placed — tap Next!</span>`;
-    hintEl.classList.remove('action');
-    hintEl.classList.add('complete');
+    hintEl.innerHTML = `<span class="text-base">✅</span><span>All placed — tap Next!</span>`;
+    hintEl.classList.remove('is-action');
+    hintEl.classList.add('is-complete');
   } else if (selectedCard) {
-    hintEl.innerHTML = `<span class="hint-icon">✨</span><span>"${selectedCard.dataset.name}" — tap a zone</span>`;
-    hintEl.classList.add('action');
-    hintEl.classList.remove('complete');
+    hintEl.innerHTML = `<span class="text-base">✨</span><span>"${selectedCard.dataset.name}" — tap a zone</span>`;
+    hintEl.classList.add('is-action');
+    hintEl.classList.remove('is-complete');
   } else {
-    hintEl.innerHTML = `<span class="hint-icon">👆</span><span>Tap a character, then tap a zone</span>`;
-    hintEl.classList.remove('action');
-    hintEl.classList.remove('complete');
+    hintEl.innerHTML = `<span class="text-base">👆</span><span>Tap a character, then tap a zone</span>`;
+    hintEl.classList.remove('is-action');
+    hintEl.classList.remove('is-complete');
   }
+}
+
+// ============= ZONE MARKUP HELPERS =============
+const ZONE_META = {
+  date:  { emoji: '💕', label: 'Date',  color: 'text-gold' },
+  marry: { emoji: '💍', label: 'Marry', color: 'text-green' },
+  kill:  { emoji: '💀', label: 'Kill',  color: 'text-red' },
+};
+
+function zoneIdleMarkup(z) {
+  const m = ZONE_META[z];
+  return `<div class="zone-icon text-2xl leading-none">${m.emoji}</div><div class="text-[11px] font-bold tracking-[0.1em] uppercase ${m.color}">${m.label}</div>`;
 }
 
 // ============= RENDER TRIO =============
@@ -196,22 +163,22 @@ function renderTrio() {
   trioCounterEl.textContent = `Trio ${currentTrioIdx + 1} / ${activeTrios.length}`;
   progressFillEl.style.width = `${(currentTrioIdx / activeTrios.length) * 100}%`;
 
-  charactersEl.innerHTML = trio.characters.map((name) => {
+  charactersEl.innerHTML = trio.characters.map((name, i) => {
     const c        = chars[name];
     const fallback = initialsOf(name);
     const imgSrc   = c && c.img ? safeImg(c.img) : null;
     const imgHtml  = imgSrc
-      ? `<img class="char-img" src="${imgSrc}" alt="${name}"
-              onerror="this.outerHTML='<div class=&quot;char-img-fallback&quot;>${fallback}</div>'">`
-      : `<div class="char-img-fallback">${fallback}</div>`;
+      ? `<img class="char-img w-full h-full object-cover" src="${imgSrc}" alt="${name}"
+              onerror="this.outerHTML='<div class=&quot;w-full h-full flex items-center justify-center font-bold text-white text-2xl&quot; style=&quot;${AVATAR_GRADIENT}&quot;>${fallback}</div>'">`
+      : `<div class="w-full h-full flex items-center justify-center font-bold text-white text-2xl" style="${AVATAR_GRADIENT}">${fallback}</div>`;
     const anime = c ? c.anime : '';
     return `
-      <div class="char-card" draggable="true" data-name="${name}">
+      <div class="char-card relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border border-white/10 bg-surface transition-colors duration-150 select-none active:scale-[0.96] anim-card-enter" style="animation-delay:${i * 0.04}s" draggable="true" data-name="${name}">
         ${imgHtml}
-        <div class="char-selected-badge">Selected</div>
-        <div class="char-overlay">
-          <div class="char-name">${name}</div>
-          <div class="char-anime">${anime}</div>
+        <div class="char-selected-badge absolute top-2 left-2 bg-pink text-white text-[10px] font-bold px-2 py-[3px] rounded-full uppercase tracking-[0.08em] pointer-events-none">Selected</div>
+        <div class="absolute inset-x-0 bottom-0 pt-8 px-2.5 pb-2 pointer-events-none" style="background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)">
+          <div class="text-xs font-bold leading-tight text-white">${name}</div>
+          <div class="text-[10px] text-white/55 mt-0.5">${anime}</div>
         </div>
       </div>
     `;
@@ -219,24 +186,18 @@ function renderTrio() {
 
   // Reset zones
   zonesEls.forEach(zone => {
-    const z     = zone.dataset.zone;
-    const emoji = z === 'date' ? '💕' : z === 'marry' ? '💍' : '💀';
-    const label = z[0].toUpperCase() + z.slice(1);
-    zone.classList.remove('filled', 'armed', 'drag-over');
-    zone.innerHTML = `<div class="zone-icon">${emoji}</div><div class="zone-label">${label}</div>`;
+    zone.classList.remove('is-filled', 'is-armed', 'is-drag-over');
+    zone.innerHTML = zoneIdleMarkup(zone.dataset.zone);
   });
 
   // Reset placement dots
   if (pdotsEl) {
-    pdotsEl.querySelectorAll('.pdot').forEach(d => {
-      d.classList.remove('filled-date', 'filled-marry', 'filled-kill');
-    });
+    pdotsEl.querySelectorAll('.pdot').forEach(d => d.classList.remove('is-filled'));
   }
 
   trioPlacements = {};
   selectedCard   = null;
   nextBtn.disabled    = true;
-  nextBtn.classList.remove('ready');
   nextBtn.textContent = currentTrioIdx === activeTrios.length - 1 ? 'See Results 🎬' : 'Next →';
 
   attachCardHandlers();
@@ -249,12 +210,12 @@ function attachCardHandlers() {
     card.addEventListener('click', () => {
       if (card.dataset.placed === 'true') return;
       if (selectedCard === card) {
-        selectedCard.classList.remove('selected');
+        selectedCard.classList.remove('is-selected');
         selectedCard = null;
       } else {
-        if (selectedCard) selectedCard.classList.remove('selected');
+        if (selectedCard) selectedCard.classList.remove('is-selected');
         selectedCard = card;
-        card.classList.add('selected');
+        card.classList.add('is-selected');
       }
       updateHint();
     });
@@ -270,32 +231,32 @@ function attachCardHandlers() {
 // ============= ZONE HANDLERS =============
 zonesEls.forEach(zone => {
   zone.addEventListener('click', () => {
-    if (zone.classList.contains('filled')) return;
+    if (zone.classList.contains('is-filled')) return;
     if (!selectedCard) {
-      hintEl.innerHTML = `<span class="hint-icon">👆</span><span>First tap a character above</span>`;
-      hintEl.classList.add('action');
+      hintEl.innerHTML = `<span class="text-base">👆</span><span>First tap a character above</span>`;
+      hintEl.classList.add('is-action');
       setTimeout(updateHint, 1500);
       return;
     }
     placeCharacter(selectedCard.dataset.name, zone);
-    selectedCard.classList.remove('selected');
+    selectedCard.classList.remove('is-selected');
     selectedCard = null;
     updateHint();
   });
 
   zone.addEventListener('dragover', e => {
     e.preventDefault();
-    if (!zone.classList.contains('filled')) zone.classList.add('drag-over');
+    if (!zone.classList.contains('is-filled')) zone.classList.add('is-drag-over');
   });
-  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('dragleave', () => zone.classList.remove('is-drag-over'));
   zone.addEventListener('drop', e => {
     e.preventDefault();
-    zone.classList.remove('drag-over');
-    if (zone.classList.contains('filled')) return;
+    zone.classList.remove('is-drag-over');
+    if (zone.classList.contains('is-filled')) return;
     const name = e.dataTransfer.getData('text/plain');
     if (!name) return;
     placeCharacter(name, zone);
-    if (selectedCard) { selectedCard.classList.remove('selected'); selectedCard = null; }
+    if (selectedCard) { selectedCard.classList.remove('is-selected'); selectedCard = null; }
     updateHint();
   });
 });
@@ -303,8 +264,8 @@ zonesEls.forEach(zone => {
 // Arm zones when a card is selected
 const armedObserver = new MutationObserver(() => {
   zonesEls.forEach(z => {
-    if (selectedCard && !z.classList.contains('filled')) z.classList.add('armed');
-    else z.classList.remove('armed');
+    if (selectedCard && !z.classList.contains('is-filled')) z.classList.add('is-armed');
+    else z.classList.remove('is-armed');
   });
 });
 armedObserver.observe(charactersEl, {
@@ -318,13 +279,14 @@ function placeCharacter(name, zone) {
   if (Object.values(trioPlacements).includes(name)) return;
   const z    = zone.dataset.zone;
   const c    = chars[name];
-  const emoji = z === 'date' ? '💕' : z === 'marry' ? '💍' : '💀';
+  const emoji = ZONE_META[z].emoji;
   const fallback = initialsOf(name);
 
   const card = document.querySelector(`.char-card[data-name="${CSS.escape(name)}"]`);
   if (card) {
     card.dataset.placed = 'true';
-    card.classList.remove('selected');
+    card.classList.add('is-placed');
+    card.classList.remove('is-selected');
   }
 
   trioPlacements[z] = name;
@@ -332,34 +294,31 @@ function placeCharacter(name, zone) {
 
   const imgSrc    = c && c.img ? safeImg(c.img) : null;
   const imgHtml   = imgSrc
-    ? `<img src="${imgSrc}" alt="${name}"
-            onerror="this.outerHTML='<div class=&quot;placed-fallback&quot;>${fallback}</div>'">`
-    : `<div class="placed-fallback">${fallback}</div>`;
+    ? `<img class="w-full h-full object-cover" src="${imgSrc}" alt="${name}"
+            onerror="this.outerHTML='<div class=&quot;w-full h-full flex items-center justify-center font-bold text-white text-lg&quot; style=&quot;${AVATAR_GRADIENT}&quot;>${fallback}</div>'">`
+    : `<div class="w-full h-full flex items-center justify-center font-bold text-white text-lg" style="${AVATAR_GRADIENT}">${fallback}</div>`;
 
-  zone.classList.add('filled');
-  zone.classList.remove('armed');
+  zone.classList.add('is-filled');
+  zone.classList.remove('is-armed');
   zone.innerHTML = `
-    <div class="placed-card">
+    <div class="anim-zone-fill relative w-full h-full">
       ${imgHtml}
-      <div class="placed-emoji">${emoji}</div>
-      <div class="placed-name">${name}</div>
+      <div class="absolute top-[7px] right-[7px] w-6 h-6 rounded-full bg-black/55 flex items-center justify-center text-xs">${emoji}</div>
+      <div class="absolute inset-x-0 bottom-0 px-2 pb-2 pt-6 text-[11px] font-bold text-white leading-tight" style="background: linear-gradient(to top, rgba(0,0,0,0.85), transparent)">${name}</div>
     </div>
   `;
 
   // Update placement dot
   if (pdotsEl) {
     const dot = pdotsEl.querySelector(`.pdot[data-zone="${z}"]`);
-    if (dot) {
-      dot.classList.remove('filled-date', 'filled-marry', 'filled-kill');
-      dot.classList.add(`filled-${z}`);
-    }
+    if (dot) dot.classList.add('is-filled');
   }
 
   vibrate();
 
   if (Object.keys(trioPlacements).length === 3) {
     nextBtn.disabled = false;
-    nextBtn.classList.add('ready');
+    nextBtn.classList.add('anim-btn-ready');
   }
 }
 
@@ -384,11 +343,15 @@ resetBtn.addEventListener('click', () => {
 backBtn.addEventListener('click', showHome);
 homeBtn.addEventListener('click', showHome);
 
-playAgainBtn.addEventListener('click', () => {
-  startMode(activeMode.id);
-});
+playAgainBtn.addEventListener('click', startDMK);
 
 // ============= SUMMARY =============
+const VERDICT_META = {
+  date:  { label: '💕 Date',  color: 'text-gold' },
+  marry: { label: '💍 Marry', color: 'text-green' },
+  kill:  { label: '💀 Kill',  color: 'text-red' },
+};
+
 function showSummary() {
   progressFillEl.style.width = '100%';
   showScreen(summaryEl);
@@ -399,20 +362,20 @@ function showSummary() {
   const tallyEl = document.getElementById('summaryTally');
   if (tallyEl) {
     tallyEl.innerHTML = `
-      <div class="tally-item tally-date">
-        <span class="tally-emoji">💕</span>
-        <span class="tally-num">${counts.date}</span>
-        <span class="tally-label">Dated</span>
+      <div class="flex flex-col items-center gap-1 pt-4 px-3 pb-3.5 rounded-2xl bg-surface border border-white/10 text-center anim-card-enter" style="animation-delay:0.03s">
+        <span class="text-xl leading-none">💕</span>
+        <span class="text-[1.8rem] font-extrabold leading-none tracking-[-0.02em] text-gold">${counts.date}</span>
+        <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-dim">Dated</span>
       </div>
-      <div class="tally-item tally-marry">
-        <span class="tally-emoji">💍</span>
-        <span class="tally-num">${counts.marry}</span>
-        <span class="tally-label">Married</span>
+      <div class="flex flex-col items-center gap-1 pt-4 px-3 pb-3.5 rounded-2xl bg-surface border border-white/10 text-center anim-card-enter" style="animation-delay:0.07s">
+        <span class="text-xl leading-none">💍</span>
+        <span class="text-[1.8rem] font-extrabold leading-none tracking-[-0.02em] text-green">${counts.marry}</span>
+        <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-dim">Married</span>
       </div>
-      <div class="tally-item tally-kill">
-        <span class="tally-emoji">💀</span>
-        <span class="tally-num">${counts.kill}</span>
-        <span class="tally-label">Killed</span>
+      <div class="flex flex-col items-center gap-1 pt-4 px-3 pb-3.5 rounded-2xl bg-surface border border-white/10 text-center anim-card-enter" style="animation-delay:0.11s">
+        <span class="text-xl leading-none">💀</span>
+        <span class="text-[1.8rem] font-extrabold leading-none tracking-[-0.02em] text-red">${counts.kill}</span>
+        <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-dim">Killed</span>
       </div>
     `;
   }
@@ -432,25 +395,25 @@ function showSummary() {
   let html = '';
   for (const [round, items] of Object.entries(byRound)) {
     html += `
-      <div class="summary-section">
-        <div class="summary-section-title">${round}</div>
-        <div class="summary-grid">
+      <div class="mb-7">
+        <div class="text-[11px] font-bold tracking-[0.12em] uppercase text-ink-faint pb-2 mb-2.5 border-b border-white/10">${round}</div>
+        <div class="grid grid-cols-3 gap-2.5">
     `;
     items.forEach(item => {
-      const label    = item.verdict === 'date' ? '💕 Date' : item.verdict === 'marry' ? '💍 Marry' : '💀 Kill';
+      const v        = VERDICT_META[item.verdict];
       const fallback = initialsOf(item.name);
       const imgSrc   = item.img ? safeImg(item.img) : null;
       const imgHtml  = imgSrc
-        ? `<img src="${imgSrc}" alt="${item.name}"
-                onerror="this.outerHTML='<div class=&quot;summary-card-fallback&quot;>${fallback}</div>'">`
-        : `<div class="summary-card-fallback">${fallback}</div>`;
+        ? `<img class="w-full h-full object-cover" src="${imgSrc}" alt="${item.name}"
+                onerror="this.outerHTML='<div class=&quot;w-full h-full flex items-center justify-center font-bold text-white text-lg&quot; style=&quot;${AVATAR_GRADIENT}&quot;>${fallback}</div>'">`
+        : `<div class="w-full h-full flex items-center justify-center font-bold text-white text-lg" style="${AVATAR_GRADIENT}">${fallback}</div>`;
       html += `
-        <div class="summary-card">
-          <span class="verdict-chip ${item.verdict}">${label}</span>
-          <div class="summary-card-img-wrap">${imgHtml}</div>
-          <div class="summary-card-info">
-            <div class="summary-card-name">${item.name}</div>
-            <div class="summary-card-anime">${item.anime}</div>
+        <div class="summary-card relative rounded-xl overflow-hidden bg-surface border border-white/10 transition-colors duration-150">
+          <span class="absolute top-1.5 left-1.5 z-10 px-2 py-[3px] rounded-full text-[10px] font-bold uppercase tracking-[0.05em] bg-black/70 ${v.color}">${v.label}</span>
+          <div class="summary-card-img-wrap aspect-square overflow-hidden">${imgHtml}</div>
+          <div class="px-2 pt-1.5 pb-2">
+            <div class="text-xs font-bold text-ink leading-tight truncate">${item.name}</div>
+            <div class="text-[10px] text-ink-faint mt-0.5 truncate">${item.anime}</div>
           </div>
         </div>
       `;
@@ -461,19 +424,18 @@ function showSummary() {
 }
 
 // ============= EYES GAME =============
-let activePack     = null;
+const EYES_ROUNDS = 10;
+
+let activeEyesPairs = [];
 let eyesIdx        = 0;
 let eyesGot        = 0;
 let eyesMissed     = 0;
 let eyesRevealed   = false;
 
-const eyesTitleEl    = document.getElementById('eyesTitle');
-const eyesPackEl     = document.getElementById('eyesPack');
 const eyesCounterEl  = document.getElementById('eyesCounter');
 const eyesProgressEl = document.getElementById('eyesProgress');
 const eyesGotEl      = document.getElementById('eyesGotScore');
 const eyesMissedEl   = document.getElementById('eyesMissedScore');
-const eyesCardEl     = document.getElementById('eyesCard');
 const eyesLayerEl    = document.getElementById('eyesLayer');
 const faceLayerEl    = document.getElementById('faceLayer');
 const eyesImgEl      = document.getElementById('eyesImg');
@@ -492,39 +454,44 @@ const eyesSummaryTitleEl = document.getElementById('eyesSummaryTitle');
 const eyesSummaryScoreEl = document.getElementById('eyesSummaryScore');
 const eyesSummaryEmojiEl = document.getElementById('eyesSummaryEmoji');
 
-function startEyesPack(packId) {
-  activePack   = eyesPacks.find(p => p.id === packId);
+function buildEyesPool() {
+  const allPairs = [];
+  eyesSources.forEach(src => {
+    const base = src.folder.split('/').map(encodeURIComponent).join('/');
+    for (let i = 0; i < src.pairCount; i++) {
+      allPairs.push({ eye: `${base}/${i * 2 + 1}.jpg`, face: `${base}/${i * 2 + 2}.jpg` });
+    }
+  });
+  return shuffle(allPairs).slice(0, EYES_ROUNDS);
+}
+
+function startEyesGame() {
+  activeEyesPairs = buildEyesPool();
   eyesIdx      = 0;
   eyesGot      = 0;
   eyesMissed   = 0;
   eyesRevealed = false;
 
-  eyesTitleEl.textContent = `${activePack.emoji} ${activePack.title}`;
-  eyesPackEl.textContent  = activePack.pack;
   showScreen(eyesScreenEl);
   renderEyesCard();
 }
 
 function renderEyesCard() {
-  const pairNum  = eyesIdx + 1;                    // 1-based pair index
-  const eyeFile  = (eyesIdx * 2 + 1);              // odd  (1, 3, 5 …)
-  const faceFile = (eyesIdx * 2 + 2);              // even (2, 4, 6 …)
-  const base     = activePack.folder.split('/').map(encodeURIComponent).join('/');
+  const pair = activeEyesPairs[eyesIdx];
 
-  eyesCounterEl.textContent  = `${pairNum} / ${activePack.pairCount}`;
-  eyesProgressEl.style.width = `${(eyesIdx / activePack.pairCount) * 100}%`;
+  eyesCounterEl.textContent  = `${eyesIdx + 1} / ${activeEyesPairs.length}`;
+  eyesProgressEl.style.width = `${(eyesIdx / activeEyesPairs.length) * 100}%`;
   eyesGotEl.textContent      = eyesGot;
   eyesMissedEl.textContent   = eyesMissed;
 
   // Pre-load both images
-  eyesImgEl.src = `${base}/${eyeFile}.jpg`;
-  faceImgEl.src = `${base}/${faceFile}.jpg`;
+  eyesImgEl.src = pair.eye;
+  faceImgEl.src = pair.face;
 
   // Reset reveal state
   eyesRevealed = false;
   eyesLayerEl.classList.remove('hidden');
   faceLayerEl.classList.add('hidden');
-  eyesCardEl.classList.remove('revealed');
   preRevealEl.classList.remove('hidden');
   postRevealEl.classList.add('hidden');
 }
@@ -533,9 +500,8 @@ function revealEyes() {
   if (eyesRevealed) return;
   eyesRevealed = true;
 
-  eyesCardEl.classList.add('revealed');
-
-  // After flip animation, switch layers
+  // Layer swap happens after a brief beat so the reveal reads as a moment,
+  // not an instant snap.
   setTimeout(() => {
     eyesLayerEl.classList.add('hidden');
     faceLayerEl.classList.remove('hidden');
@@ -551,15 +517,15 @@ function scoreEyes(got) {
   // Animate the changed score counter
   const scoreEl = got ? eyesGotEl : eyesMissedEl;
   scoreEl.textContent = got ? eyesGot : eyesMissed;
-  scoreEl.classList.remove('score-pop');
+  scoreEl.classList.remove('anim-score-pop');
   void scoreEl.offsetWidth; // force reflow
-  scoreEl.classList.add('score-pop');
+  scoreEl.classList.add('anim-score-pop');
 
   vibrate(got ? [10, 30, 10] : [20]);
 
   eyesIdx++;
 
-  if (eyesIdx >= activePack.pairCount) {
+  if (eyesIdx >= activeEyesPairs.length) {
     showEyesSummary();
   } else {
     renderEyesCard();
@@ -568,7 +534,7 @@ function scoreEyes(got) {
 
 function showEyesSummary() {
   eyesProgressEl.style.width = '100%';
-  const total    = activePack.pairCount;
+  const total    = activeEyesPairs.length;
   const pct      = Math.round((eyesGot / total) * 100);
   const emoji    = pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '😅';
   const title    = pct >= 80 ? 'Impressive!' : pct >= 50 ? 'Not Bad!' : 'Keep Practicing!';
@@ -587,7 +553,7 @@ gotItBtn.addEventListener('click', () => scoreEyes(true));
 missedBtn.addEventListener('click', () => scoreEyes(false));
 eyesBackBtn.addEventListener('click', showHome);
 eyesHomeBtn.addEventListener('click', showHome);
-eyesPlayAgainBtn.addEventListener('click', () => startEyesPack(activePack.id));
+eyesPlayAgainBtn.addEventListener('click', startEyesGame);
 
 // ============= KEYBOARD SHORTCUTS =============
 document.addEventListener('keydown', e => {
@@ -619,7 +585,7 @@ document.addEventListener('keydown', e => {
       return;
     }
     if (key === 'escape' && selectedCard) {
-      selectedCard.classList.remove('selected');
+      selectedCard.classList.remove('is-selected');
       selectedCard = null;
       updateHint();
     }
@@ -644,27 +610,10 @@ let qbankFilter   = 'All';
 let qbankChecked  = {};
 let qbankDragId   = null;
 
-const QBANK_CAT_CLASS = {
-  'Controversial': 'qcat-controversial',
-  'Power Scaling': 'qcat-power',
-  'Industry':      'qcat-industry',
-  'General':       'qcat-general',
-};
+const QBANK_CAT_PILL = 'text-ink-dim bg-white/5';
+const QBANK_FILTER_ACTIVE = 'bg-ink border-transparent text-bg';
 
-const QBANK_FILTER_CLASS = {
-  'All':           'qf-all',
-  'Controversial': 'qf-controversial',
-  'Power Scaling': 'qf-power',
-  'Industry':      'qf-industry',
-  'General':       'qf-general',
-};
-
-const QBANK_STAT_COLOR = {
-  'Controversial': 'var(--qc-controversial)',
-  'Power Scaling': 'var(--qc-power)',
-  'Industry':      'var(--qc-industry)',
-  'General':       'var(--qc-general)',
-};
+const QCARD_BTN = 'w-9 h-9 rounded-lg border border-white/10 bg-transparent text-ink-faint cursor-pointer text-sm flex items-center justify-center font-sans transition-colors duration-150 hover:bg-white/5 hover:text-ink';
 
 function startQbank() {
   showScreen(qbankEl);
@@ -683,7 +632,7 @@ function getFilteredQbank() {
 function renderQbankMeta() {
   const asked = Object.values(qbankChecked).filter(Boolean).length;
   const metaEl = document.getElementById('qbankMeta');
-  if (metaEl) metaEl.textContent = `${qbankItems.length} questions · ${asked} asked · Drag to reorder`;
+  if (metaEl) metaEl.textContent = `${qbankItems.length} questions · ${asked} asked · Tap ▲▼ to reorder`;
 }
 
 function renderQbankFilters() {
@@ -691,10 +640,12 @@ function renderQbankFilters() {
   if (!filtersEl) return;
   filtersEl.innerHTML = QBANK_CATEGORIES.map(cat => {
     const isActive = qbankFilter === cat;
-    const cls = isActive ? QBANK_FILTER_CLASS[cat] : 'qf-inactive';
-    return `<button class="qbank-filter-btn ${cls}" data-cat="${cat}">${cat}</button>`;
+    const cls = isActive
+      ? QBANK_FILTER_ACTIVE
+      : 'bg-transparent border-white/10 text-ink-dim hover:bg-white/5 hover:text-ink';
+    return `<button class="shrink-0 min-h-9 px-3.5 rounded-full font-sans text-xs font-semibold cursor-pointer transition-colors duration-150 whitespace-nowrap flex items-center border ${cls}" data-cat="${cat}">${cat}</button>`;
   }).join('');
-  filtersEl.querySelectorAll('.qbank-filter-btn').forEach(btn => {
+  filtersEl.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', () => {
       qbankFilter = btn.dataset.cat;
       renderQbankFilters();
@@ -710,8 +661,8 @@ function renderQbankList() {
 
   if (filtered.length === 0) {
     listEl.innerHTML = `
-      <div class="qbank-empty">
-        <span class="qbank-empty-icon">📭</span>
+      <div class="text-center py-11 px-5 text-ink-faint text-sm">
+        <span class="block text-4xl mb-3 grayscale-[0.4]">📭</span>
         No questions in this category yet.
       </div>`;
     return;
@@ -719,25 +670,29 @@ function renderQbankList() {
 
   listEl.innerHTML = filtered.map((q, i) => {
     const checked   = !!qbankChecked[q.id];
-    const catCls    = QBANK_CAT_CLASS[q.category] || 'qcat-general';
     const shotCount = qbankShotData[q.id]?.count ?? 0;
     const hasShots  = shotCount > 0;
+    const isFirst   = i === 0;
+    const isLast    = i === filtered.length - 1;
     return `
-      <div class="qcard${checked ? ' qcard-checked' : ''}" data-id="${q.id}" draggable="true">
-        <div class="qcard-num">${i + 1}</div>
-        <div class="qcard-body">
-          <div class="qcard-text">${q.text}</div>
-          <div class="qcard-tags">
-            <span class="qcat-pill ${catCls}">${q.category}</span>
-            ${q.viral ? '<span class="qviral-pill">🔥 Viral Pick</span>' : ''}
+      <div class="qcard${checked ? ' is-checked' : ''} bg-surface border border-white/10 rounded-2xl px-3.5 py-3 flex items-start gap-3 cursor-grab active:cursor-grabbing transition-colors duration-150 select-none" data-id="${q.id}" draggable="true">
+        <div class="flex flex-col gap-1.5 shrink-0">
+          <button class="qbtn-move w-9 h-4 rounded border border-white/10 bg-transparent text-ink-faint text-[9px] leading-none flex items-center justify-center transition-colors duration-150 hover:bg-white/5 hover:text-ink disabled:opacity-20 disabled:pointer-events-none" data-dir="up" data-id="${q.id}" ${isFirst ? 'disabled' : ''} title="Move up" aria-label="Move question up">▲</button>
+          <div class="qcard-num min-w-7 h-7 rounded-lg bg-white/5 text-ink-faint flex items-center justify-center text-xs font-bold shrink-0">${i + 1}</div>
+          <button class="qbtn-move w-9 h-4 rounded border border-white/10 bg-transparent text-ink-faint text-[9px] leading-none flex items-center justify-center transition-colors duration-150 hover:bg-white/5 hover:text-ink disabled:opacity-20 disabled:pointer-events-none" data-dir="down" data-id="${q.id}" ${isLast ? 'disabled' : ''} title="Move down" aria-label="Move question down">▼</button>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="qcard-text text-sm font-medium leading-snug text-ink transition-colors duration-150">${q.text}</div>
+          <div class="flex gap-1.5 mt-2 items-center">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold tracking-[0.03em] ${QBANK_CAT_PILL}">${q.viral ? '🔥 ' : ''}${q.category}</span>
           </div>
         </div>
-        <div class="qcard-actions">
-          <button class="qcard-btn qbtn-shoot${hasShots ? ' has-shots' : ''}" data-id="${q.id}" title="Record a shot for this question">
-            🎬 <span class="shoot-count">${shotCount}</span>
+        <div class="flex gap-1.5 shrink-0 self-start">
+          <button class="qcard-btn qbtn-shoot${hasShots ? ' is-has-shots' : ''} ${QCARD_BTN} w-auto! px-2.5 gap-1 min-w-[48px] whitespace-nowrap" data-id="${q.id}" title="Record a shot for this question">
+            🎬 <span class="shoot-count text-sm font-bold inline-block">${shotCount}</span>
           </button>
-          <button class="qcard-btn qbtn-check${checked ? ' active' : ''}" data-id="${q.id}" title="Mark as asked">✓</button>
-          <button class="qcard-btn qbtn-del" data-id="${q.id}" title="Delete">✕</button>
+          <button class="qcard-btn qbtn-check${checked ? ' is-active' : ''} ${QCARD_BTN}" data-id="${q.id}" title="Mark as asked">✓</button>
+          <button class="qcard-btn qbtn-del ${QCARD_BTN} hover:bg-red/10! hover:text-red!" data-id="${q.id}" title="Delete">✕</button>
         </div>
       </div>`;
   }).join('');
@@ -761,22 +716,29 @@ function renderQbankList() {
       qbankDelete(id, card);
     });
 
-    // Drag to reorder
+    card.querySelectorAll('.qbtn-move').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        qbankMove(id, btn.dataset.dir);
+      });
+    });
+
+    // Drag to reorder (mouse/trackpad — touch users get the ▲▼ buttons above)
     card.addEventListener('dragstart', () => {
       qbankDragId = id;
     });
     card.addEventListener('dragend', () => {
       qbankDragId = null;
-      card.classList.remove('qcard-drag-over');
+      card.classList.remove('is-drag-target');
     });
     card.addEventListener('dragover', e => {
       e.preventDefault();
-      if (qbankDragId != null && qbankDragId !== id) card.classList.add('qcard-drag-over');
+      if (qbankDragId != null && qbankDragId !== id) card.classList.add('is-drag-target');
     });
-    card.addEventListener('dragleave', () => card.classList.remove('qcard-drag-over'));
+    card.addEventListener('dragleave', () => card.classList.remove('is-drag-target'));
     card.addEventListener('drop', e => {
       e.preventDefault();
-      card.classList.remove('qcard-drag-over');
+      card.classList.remove('is-drag-target');
       if (qbankDragId == null || qbankDragId === id) return;
       const arr  = [...qbankItems];
       const from = arr.findIndex(q => q.id === qbankDragId);
@@ -791,12 +753,30 @@ function renderQbankList() {
   });
 }
 
+// Tap-friendly reorder for touch devices, where native HTML5 drag-and-drop
+// doesn't fire. Swaps the item with its neighbor in the *filtered* view so
+// the move always matches what's currently on screen.
+function qbankMove(id, dir) {
+  const filtered = getFilteredQbank();
+  const filteredIdx = filtered.findIndex(q => q.id === id);
+  const neighborIdx = dir === 'up' ? filteredIdx - 1 : filteredIdx + 1;
+  if (filteredIdx === -1 || neighborIdx < 0 || neighborIdx >= filtered.length) return;
+
+  const a = qbankItems.findIndex(q => q.id === id);
+  const b = qbankItems.findIndex(q => q.id === filtered[neighborIdx].id);
+  if (a === -1 || b === -1) return;
+
+  [qbankItems[a], qbankItems[b]] = [qbankItems[b], qbankItems[a]];
+  vibrate(8);
+  renderQbankList();
+}
+
 function qbankToggleCheck(id, card) {
   qbankChecked[id] = !qbankChecked[id];
   const checked = qbankChecked[id];
-  card.classList.toggle('qcard-checked', checked);
+  card.classList.toggle('is-checked', checked);
   const checkBtn = card.querySelector('.qbtn-check');
-  if (checkBtn) checkBtn.classList.toggle('active', checked);
+  if (checkBtn) checkBtn.classList.toggle('is-active', checked);
   vibrate(checked ? 10 : 6);
   renderQbankMeta();
 }
@@ -811,13 +791,13 @@ function qbankShoot(id, card) {
   // Surgically update the shoot button (no full list rerender)
   const btn = card.querySelector('.qbtn-shoot');
   if (btn) {
-    btn.classList.add('has-shots');
+    btn.classList.add('is-has-shots');
     const countEl = btn.querySelector('.shoot-count');
     if (countEl) {
       countEl.textContent = qbankShotData[id].count;
-      countEl.classList.remove('shoot-pop');
+      countEl.classList.remove('anim-shoot-pop');
       void countEl.offsetWidth; // force reflow for animation replay
-      countEl.classList.add('shoot-pop');
+      countEl.classList.add('anim-shoot-pop');
     }
   }
 
@@ -840,9 +820,8 @@ function qbankDelete(id, card) {
     delete qbankChecked[id];
     card.remove();
     // Renumber remaining cards
-    document.querySelectorAll('.qcard').forEach((c, i) => {
-      const n = c.querySelector('.qcard-num');
-      if (n) n.textContent = i + 1;
+    document.querySelectorAll('.qcard-num').forEach((n, i) => {
+      n.textContent = i + 1;
     });
     renderQbankMeta();
     renderQbankFooterStats();
@@ -857,9 +836,9 @@ function renderQbankFooterStats() {
   el.innerHTML = [
     ...cats.map(cat => {
       const count = qbankItems.filter(q => q.category === cat).length;
-      return `<div class="qbank-stat"><b style="color:${QBANK_STAT_COLOR[cat]}">${count}</b> ${cat}</div>`;
+      return `<div class="text-[0.75rem] text-ink-faint"><b class="font-extrabold text-ink">${count}</b> ${cat}</div>`;
     }),
-    `<div class="qbank-stat"><b style="color:var(--qc-controversial)">${viral}</b> Viral</div>`,
+    `<div class="text-[0.75rem] text-ink-faint"><b class="font-extrabold text-ink">${viral}</b> Viral</div>`,
   ].join('');
 }
 
@@ -901,11 +880,11 @@ function syntaxHighlightJson(json) {
     /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
     match => {
       if (/^"/.test(match)) {
-        return `<span class="${/:$/.test(match) ? 'json-key' : 'json-str'}">${match}</span>`;
+        return `<span class="${/:$/.test(match) ? 'text-ink' : 'text-[#4ade80]'}">${match}</span>`;
       }
-      if (/true|false/.test(match)) return `<span class="json-bool">${match}</span>`;
-      if (/null/.test(match))       return `<span class="json-null">${match}</span>`;
-      return `<span class="json-num">${match}</span>`;
+      if (/true|false/.test(match)) return `<span class="text-[#a855f7]">${match}</span>`;
+      if (/null/.test(match))       return `<span class="text-ink-faint">${match}</span>`;
+      return `<span class="text-[#22d3ee]">${match}</span>`;
     }
   );
 }
@@ -918,17 +897,17 @@ function openQbankJsonViewer() {
 
   // Summary strip
   summary.innerHTML = `
-    <div class="qjs-stat">
-      <span class="qjs-num" style="color:var(--qc-industry)">${data.summary.totalShots}</span>
-      <span class="qjs-label">Total Shots</span>
+    <div class="flex-1 px-4 py-3 text-center border-r border-white/[0.07]">
+      <span class="block text-[1.6rem] font-black leading-none tracking-[-0.04em] text-ink">${data.summary.totalShots}</span>
+      <span class="block text-[0.62rem] font-bold uppercase tracking-[0.08em] text-ink-faint mt-1">Total Shots</span>
     </div>
-    <div class="qjs-stat">
-      <span class="qjs-num" style="color:var(--qc-power)">${data.summary.totalQuestionsUsed}</span>
-      <span class="qjs-label">Questions Used</span>
+    <div class="flex-1 px-4 py-3 text-center border-r border-white/[0.07]">
+      <span class="block text-[1.6rem] font-black leading-none tracking-[-0.04em] text-ink">${data.summary.totalQuestionsUsed}</span>
+      <span class="block text-[0.62rem] font-bold uppercase tracking-[0.08em] text-ink-faint mt-1">Questions Used</span>
     </div>
-    <div class="qjs-stat">
-      <span class="qjs-num" style="color:var(--qc-general)">${qbankItems.length}</span>
-      <span class="qjs-label">In Bank</span>
+    <div class="flex-1 px-4 py-3 text-center">
+      <span class="block text-[1.6rem] font-black leading-none tracking-[-0.04em] text-ink">${qbankItems.length}</span>
+      <span class="block text-[0.62rem] font-bold uppercase tracking-[0.08em] text-ink-faint mt-1">In Bank</span>
     </div>
   `;
 
@@ -1000,7 +979,7 @@ function qbankAddQuestion() {
   const text  = input.value.trim();
   if (!text) {
     input.focus();
-    input.style.borderColor = 'var(--qc-controversial)';
+    input.style.borderColor = 'var(--color-qc-controversial)';
     setTimeout(() => { input.style.borderColor = ''; }, 1200);
     return;
   }

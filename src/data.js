@@ -1,271 +1,23 @@
-// ============= GAME MODES =============
-export const gameModes = [
-  {
-    id: 'same-universe',
-    title: 'Same Universe',
-    emoji: '🔥',
-    description: 'Hardest choices — same squad, pick their fate',
-    tags: ['Male', 'Heroes'],
-    accent: 'pink',
-    trios: [
-      { round: '🍜 Naruto Universe', characters: ['Naruto', 'Sasuke', 'Kakashi'] },
-      { round: '⚓ One Piece', characters: ['Luffy', 'Zoro', 'Sanji'] },
-      { round: '👁️ Jujutsu Kaisen', characters: ['Satoru Gojo', 'Nanami', 'Geto'] },
-    ],
-  },
-  {
-    id: 'villain-edition',
-    title: 'Villain Edition',
-    emoji: '😈',
-    description: 'Pure evil — no heroes, no right answer',
-    tags: ['Male', 'Villains'],
-    accent: 'red',
-    trios: [
-      { round: '🔥 Naruto Villains', characters: ['Madara', 'Pain', 'Obito'] },
-      { round: '💀 Crossover Evil', characters: ['Griffith', 'Dio', 'Light Yagami'] },
-    ],
-  },
-  {
-    id: 'crossover-chaos',
-    title: 'Crossover Chaos',
-    emoji: '🤯',
-    description: 'Universes collide — who gets the date?',
-    tags: ['Male', 'Mix'],
-    accent: 'purple',
-    trios: [
-      { round: '⚡ Icons Collide', characters: ['Levi', 'Vegeta', 'Itachi'] },
-      { round: '🌀 Best of the Best', characters: ['Sasuke', 'Luffy', 'Satoru Gojo'] },
-    ],
-  },
-  {
-    id: 'impossible-choice',
-    title: 'Impossible Choice',
-    emoji: '😤',
-    description: 'Fan favorites only — this will tear you apart',
-    tags: ['Female', 'Fan Favs'],
-    accent: 'gold',
-    trios: [
-      { round: '😤 Impossible Choice', characters: ['Zero Two', 'Yor Forger', 'Makima'] },
-      { round: '😤 Impossible Choice', characters: ['Hinata Hyuga', 'Sakura Haruno', 'Tsunade'] },
-      { round: '😤 Impossible Choice', characters: ['Nami', 'Nico Robin', 'Boa Hancock'] },
-      { round: '😤 Impossible Choice', characters: ['Rem', 'Ram', 'Emilia'] },
-    ],
-  },
-  {
-    id: 'waifu-wars',
-    title: 'Waifu Wars',
-    emoji: '💀',
-    description: 'The community will fight over this one',
-    tags: ['Female', 'Mix'],
-    accent: 'green',
-    trios: [
-      { round: '💀 Waifu Wars', characters: ['Nezuko Kamado', 'Nobara Kugisaki', 'Maki Zenin'] },
-      { round: '💀 Waifu Wars', characters: ['Mikasa Ackerman', 'Historia Reiss', 'Sasha Braus'] },
-      { round: '💀 Powerhouse Trio', characters: ['Albedo', 'Shalltear', 'Satoru Gojo'] },
-    ],
-  },
-  {
-    id: 'villain-waifus',
-    title: 'Villain Waifus',
-    emoji: '🔥',
-    description: 'Dangerous women — pick your doom',
-    tags: ['Female', 'Villains'],
-    accent: 'red',
-    trios: [
-      { round: '🔥 Villain Edition', characters: ['Makima', 'Toga Himiko', 'Esdeath'] },
-    ],
-  },
-  {
-    id: 'betrayal-round',
-    title: 'Betrayal Round',
-    emoji: '😭',
-    description: 'Characters who broke our hearts — justice time',
-    tags: ['Female', 'Mix'],
-    accent: 'blue',
-    trios: [
-      { round: '😭 Betrayal Round', characters: ['Sakura Haruno', 'Orihime Inoue', 'Serena'] },
-    ],
-  },
-];
-
-// ============= EYES GUESS PACKS =============
-export const eyesPacks = [
-  {
-    id: 'female-eyes-1',
-    title: 'Female Characters',
-    pack: 'Pack 1',
-    emoji: '👁️',
-    description: 'Identify these female characters by their eyes alone',
-    tags: ['Female'],
-    accent: 'pink',
-    folder: 'Anime Female Characters by eyes',
-    pairCount: 8,
-  },
-  {
-    id: 'male-eyes-1',
-    title: 'Male Characters',
-    pack: 'Pack 1',
-    emoji: '👁️',
-    description: 'Identify these male characters by their eyes alone',
-    tags: ['Male'],
-    accent: 'blue',
-    folder: 'Anime Male Characters by eyes',
-    pairCount: 8,
-  },
-  {
-    id: 'female-eyes-2',
-    title: 'Female Characters',
-    pack: 'Pack 2',
-    emoji: '🎯',
-    description: 'Harder pack — more female characters to identify',
-    tags: ['Female'],
-    accent: 'purple',
-    folder: 'Guess Female Anime characters by eyes',
-    pairCount: 9,
-  },
-  {
-    id: 'male-eyes-2',
-    title: 'Male Characters',
-    pack: 'Pack 2',
-    emoji: '🎯',
-    description: 'Level up — trickier male characters to guess',
-    tags: ['Male'],
-    accent: 'green',
-    folder: 'Guess Male Anime characters by eyes',
-    pairCount: 10,
-  },
-  {
-    id: 'anime-eyes-1',
-    title: 'Anime Characters',
-    pack: 'Pack 1',
-    emoji: '👁️',
-    description: 'Identify these anime characters by their eyes alone',
-    tags: ['Mixed'],
-    accent: 'orange',
-    folder: 'anime characters by looking at eyes 1',
-    pairCount: 5,
-  },
-  {
-    id: 'anime-eyes-2',
-    title: 'Anime Characters',
-    pack: 'Pack 2',
-    emoji: '🎯',
-    description: 'Identify these anime characters by their eyes alone',
-    tags: ['Mixed'],
-    accent: 'orange',
-    folder: 'anime characters by looking at eyes 2',
-    pairCount: 5,
-  },
-  {
-    id: 'anime-eyes-3',
-    title: 'Anime Characters',
-    pack: 'Pack 3',
-    emoji: '👁️',
-    description: 'Identify these anime characters by their eyes alone',
-    tags: ['Mixed'],
-    accent: 'orange',
-    folder: 'anime characters by looking at eyes 3',
-    pairCount: 5,
-  },
-  {
-    id: 'anime-eyes-4',
-    title: 'Anime Characters',
-    pack: 'Pack 4',
-    emoji: '🎯',
-    description: 'Identify these anime characters by their eyes alone',
-    tags: ['Mixed'],
-    accent: 'orange',
-    folder: 'anime characters by looking at eyes 4',
-    pairCount: 5,
-  },
-  {
-    id: 'anime-eyes-5',
-    title: 'Anime Characters',
-    pack: 'Pack 5',
-    emoji: '👁️',
-    description: 'Identify these anime characters by their eyes alone',
-    tags: ['Mixed'],
-    accent: 'orange',
-    folder: 'anime characters by looking at eyes 5',
-    pairCount: 5,
-  },
-  {
-    id: 'anime-eyes-6',
-    title: 'Anime Characters',
-    pack: 'Pack 6',
-    emoji: '🎯',
-    description: 'Identify these anime characters by their eyes alone',
-    tags: ['Mixed'],
-    accent: 'orange',
-    folder: 'anime characters by looking at eyes 6',
-    pairCount: 5,
-  },
-  {
-    id: 'anime-eyes-7',
-    title: 'Anime Characters',
-    pack: 'Pack 7',
-    emoji: '👁️',
-    description: 'Identify these anime characters by their eyes alone',
-    tags: ['Mixed'],
-    accent: 'orange',
-    folder: 'anime characters by looking at eyes 7',
-    pairCount: 5,
-  },
-  {
-    id: 'anime-eyes-8',
-    title: 'Anime Characters',
-    pack: 'Pack 8',
-    emoji: '🎯',
-    description: 'Identify these anime characters by their eyes alone',
-    tags: ['Mixed'],
-    accent: 'orange',
-    folder: 'anime characters by looking at eyes 8',
-    pairCount: 5,
-  },
-  {
-    id: 'anime-eyes-9',
-    title: 'Anime Characters',
-    pack: 'Pack 9',
-    emoji: '👁️',
-    description: 'Identify these anime characters by their eyes alone',
-    tags: ['Mixed'],
-    accent: 'orange',
-    folder: 'anime characters by looking at eyes 9',
-    pairCount: 5,
-  },
-  {
-    id: 'anime-eyes-10',
-    title: 'Anime Characters',
-    pack: 'Pack 10',
-    emoji: '🎯',
-    description: 'Identify these anime characters by their eyes alone',
-    tags: ['Mixed'],
-    accent: 'orange',
-    folder: 'anime characters by looking at eyes 10',
-    pairCount: 5,
-  },
-  {
-    id: 'anime-eyes-11',
-    title: 'Anime Characters',
-    pack: 'Pack 11',
-    emoji: '👁️',
-    description: 'Identify these anime characters by their eyes alone',
-    tags: ['Mixed'],
-    accent: 'orange',
-    folder: 'anime characters by looking at eyes 11',
-    pairCount: 5,
-  },
-  {
-    id: 'anime-eyes-12',
-    title: 'Anime Characters',
-    pack: 'Pack 12',
-    emoji: '🎯',
-    description: 'Identify these anime characters by their eyes alone',
-    tags: ['Mixed'],
-    accent: 'orange',
-    folder: 'anime characters by looking at eyes 12',
-    pairCount: 4,
-  },
+// ============= EYES GUESS SOURCES =============
+// Raw pair-image folders. The game pools every pair across all of these
+// and deals a random subset each playthrough — no separate pack picker.
+export const eyesSources = [
+  { folder: 'Anime Female Characters by eyes', pairCount: 8 },
+  { folder: 'Anime Male Characters by eyes', pairCount: 8 },
+  { folder: 'Guess Female Anime characters by eyes', pairCount: 9 },
+  { folder: 'Guess Male Anime characters by eyes', pairCount: 10 },
+  { folder: 'anime characters by looking at eyes 1', pairCount: 5 },
+  { folder: 'anime characters by looking at eyes 2', pairCount: 5 },
+  { folder: 'anime characters by looking at eyes 3', pairCount: 5 },
+  { folder: 'anime characters by looking at eyes 4', pairCount: 5 },
+  { folder: 'anime characters by looking at eyes 5', pairCount: 5 },
+  { folder: 'anime characters by looking at eyes 6', pairCount: 5 },
+  { folder: 'anime characters by looking at eyes 7', pairCount: 5 },
+  { folder: 'anime characters by looking at eyes 8', pairCount: 5 },
+  { folder: 'anime characters by looking at eyes 9', pairCount: 5 },
+  { folder: 'anime characters by looking at eyes 10', pairCount: 5 },
+  { folder: 'anime characters by looking at eyes 11', pairCount: 5 },
+  { folder: 'anime characters by looking at eyes 12', pairCount: 4 },
 ];
 
 // ============= QUESTION BANK =============
@@ -322,19 +74,19 @@ export const qbankQuestions = [
 // ============= ALL CHARACTERS =============
 export const chars = {
   // ---- Naruto ----
-  'Naruto': { img: 'images/Naruto Uzumaki.jpg', anime: 'Naruto' },
-  'Sasuke': { img: 'images/Sasuke Uchiha.png', anime: 'Naruto' },
-  'Kakashi': { img: 'images/Kakashi Hatake.webp', anime: 'Naruto' },
+  'Naruto': { img: 'images/Naruto.jpg', anime: 'Naruto' },
+  'Sasuke': { img: 'images/Sasuke Uchiha.jpg', anime: 'Naruto' },
+  'Kakashi': { img: 'images/Kakashi Hatake.jpg', anime: 'Naruto' },
   'Madara': { img: 'images/Madara Uchiha.avif', anime: 'Naruto' },
-  'Pain': { img: 'images/Pain.png', anime: 'Naruto' },
+  'Pain': { img: 'images/Pain.jpg', anime: 'Naruto' },
   'Obito': { img: 'images/Obito Uchiha.png', anime: 'Naruto' },
   'Itachi': { img: 'images/Itachi Uchiha.webp', anime: 'Naruto' },
 
   // ---- One Piece ----
   'Luffy': { img: 'images/Monkey D. Luffy.png', anime: 'One Piece' },
   'Zoro': { img: 'images/Roronoa Zoro.png', anime: 'One Piece' },
-  'Sanji': { img: 'images/Sanji.webp', anime: 'One Piece' },
-  'Nami': { img: 'images/Nami.webp', anime: 'One Piece' },
+  'Sanji': { img: 'images/Sanji.jpg', anime: 'One Piece' },
+  'Nami': { img: 'images/Nami.jpg', anime: 'One Piece' },
   'Nico Robin': { img: 'images/Nico Robin.png', anime: 'One Piece' },
   'Boa Hancock': { img: 'images/Boa Hancock.jpg', anime: 'One Piece' },
 
@@ -346,8 +98,8 @@ export const chars = {
   'Maki Zenin': { img: 'images/Maki Zenin.jpg', anime: 'Jujutsu Kaisen' },
 
   // ---- Attack on Titan ----
-  'Levi': { img: 'images/Levi Ackerman.jpg', anime: 'Attack on Titan' },
-  'Mikasa Ackerman': { img: 'images/Mikasa Ackerman.jpg', anime: 'Attack on Titan' },
+  'Levi': { img: 'images/Levi.jpg', anime: 'Attack on Titan' },
+  'Mikasa Ackerman': { img: 'images/Mikasa.jpg', anime: 'Attack on Titan' },
   'Historia Reiss': { img: 'images/Historia Reiss.jpg', anime: 'Attack on Titan' },
   'Sasha Braus': { img: 'images/Sasha Braus.jpg', anime: 'Attack on Titan' },
 
@@ -355,9 +107,9 @@ export const chars = {
   'Vegeta': { img: 'images/Vegeta.jpg', anime: 'Dragon Ball Z' },
 
   // ---- Crossover Villains ----
-  'Griffith': { img: 'images/Griffith.webp', anime: 'Berserk' },
+  'Griffith': { img: 'images/Griffith.jpg', anime: 'Berserk' },
   'Dio': { img: 'images/Dio Brando.jpeg', anime: "JoJo's Bizarre Adventure" },
-  'Light Yagami': { img: 'images/Light Yagami.png', anime: 'Death Note' },
+  'Light Yagami': { img: 'images/Light Yagami.jpg', anime: 'Death Note' },
 
   // ---- Re:Zero ----
   'Rem': { img: 'images/Rem.jpg', anime: 'Re:Zero' },
@@ -365,7 +117,15 @@ export const chars = {
   'Emilia': { img: 'images/Emilia.jpg', anime: 'Re:Zero' },
 
   // ---- Demon Slayer ----
-  'Nezuko Kamado': { img: 'images/Nezuko Kamado.jpg', anime: 'Demon Slayer' },
+  'Nezuko Kamado': { img: 'images/nezuko kamado.jpg', anime: 'Demon Slayer' },
+  'Zenitsu Agatsuma': { img: 'images/Zenitsu.jpg', anime: 'Demon Slayer' },
+  'Inosuke Hashibira': { img: 'images/inosuke.png', anime: 'Demon Slayer' },
+  'Giyuu Tomioka': { img: 'images/𝐓𝐨𝐦𝐢𝐨𝐤𝐚 𝐆𝐢𝐲𝐮𝐮.jpg', anime: 'Demon Slayer' },
+  'Kyojuro Rengoku': { img: 'images/Kyojuro Rengoku.webp', anime: 'Demon Slayer' },
+  'Shinobu Kocho': { img: 'images/Shinobu Kocho.jpg', anime: 'Demon Slayer' },
+  'Mitsuri Kanroji': { img: 'images/KANROJI MITSURI.jpg', anime: 'Demon Slayer' },
+  'Kanao Tsuyuri': { img: 'images/Kanao Tsuyuri.webp', anime: 'Demon Slayer' },
+  'Muichiro Tokito': { img: 'images/Muichiro Tokito.jpg', anime: 'Demon Slayer' },
 
   // ---- Overlord ----
   'Albedo': { img: 'images/Albedo.jpeg', anime: 'Overlord' },
@@ -381,7 +141,7 @@ export const chars = {
   'Makima': { img: 'images/Makima.jpg', anime: 'Chainsaw Man' },
 
   // ---- Naruto (female) ----
-  'Hinata Hyuga': { img: 'images/Hinata Hyuga.jpg', anime: 'Naruto' },
+  'Hinata Hyuga': { img: 'images/Hinata.jpg', anime: 'Naruto' },
   'Sakura Haruno': { img: 'images/Sakura Haruno.jpg', anime: 'Naruto' },
   'Tsunade': { img: 'images/Tsunade.jpg', anime: 'Naruto' },
 
@@ -396,4 +156,66 @@ export const chars = {
 
   // ---- Pokémon ----
   'Serena': { img: 'images/Serena.jpg', anime: 'Pokémon' },
+
+  // ---- Dragon Ball ----
+  'Goku': { img: 'images/Goku.jpg', anime: 'Dragon Ball Z' },
+  'Bulma': { img: 'images/Bulma.jpg', anime: 'Dragon Ball' },
+  'Beerus': { img: 'images/Beerus.jpg', anime: 'Dragon Ball Super' },
+  'Frieza': { img: 'images/Frieza.jpg', anime: 'Dragon Ball Z' },
+  'Cell': { img: 'images/Cell DBZ.jpg', anime: 'Dragon Ball Z' },
+  'Jiren': { img: 'images/Jiren.jpg', anime: 'Dragon Ball Super' },
+
+  // ---- Naruto (more) ----
+  'Gaara': { img: 'images/Gara naruto.jpg', anime: 'Naruto' },
+  'Ino Yamanaka': { img: 'images/Ino Yamanaka .jpg', anime: 'Naruto' },
+  'Jiraiya': { img: 'images/Jiraiya.jpg', anime: 'Naruto' },
+
+  // ---- Jujutsu Kaisen (more) ----
+  'Yuji Itadori': { img: 'images/Itadori yuuji.jpg', anime: 'Jujutsu Kaisen' },
+  'Ryomen Sukuna': { img: 'images/Sukuna.jpg', anime: 'Jujutsu Kaisen' },
+
+  // ---- My Hero Academia (more) ----
+  'Izuku Midoriya': { img: 'images/Izuku Midoriya.png', anime: 'My Hero Academia' },
+  'Katsuki Bakugo': { img: 'images/Katsuki Bakugo.avif', anime: 'My Hero Academia' },
+  'Shoto Todoroki': { img: 'images/Shoto Todoroki.jpg', anime: 'My Hero Academia' },
+  'Midnight': { img: 'images/Midnight.jpg', anime: 'My Hero Academia' },
+
+  // ---- Spy x Family (more) ----
+  'Anya Forger': { img: 'images/Anya Forger.avif', anime: 'Spy x Family' },
+  'Loid Forger': { img: 'images/Loid Forger.webp', anime: 'Spy x Family' },
+
+  // ---- Chainsaw Man (more) ----
+  'Reze': { img: 'images/Reze.jpg', anime: 'Chainsaw Man' },
+
+  // ---- Mushoku Tensei ----
+  'Rudeus Greyrat': { img: 'images/𝙍𝙪𝙙𝙚𝙪𝙨 𝙂𝙧𝙚𝙮𝙧𝙖𝙩.jpg', anime: 'Mushoku Tensei' },
+  'Roxy Migurdia': { img: 'images/Roxy Migurdia.jpg', anime: 'Mushoku Tensei' },
+  'Sylphiette': { img: 'images/Sylphiette.jpg', anime: 'Mushoku Tensei' },
+
+  // ---- Re:Zero (more) ----
+  'Subaru Natsuki': { img: 'images/subaru natsuki.jpg', anime: 'Re:Zero' },
+
+  // ---- Death Note (more) ----
+  'L': { img: 'images/L (Death Note).jpg', anime: 'Death Note' },
+
+  // ---- Bleach (more) ----
+  'Toshiro Hitsugaya': { img: 'images/Toshiro Hitsugaya.webp', anime: 'Bleach' },
+
+  // ---- Future Diary ----
+  'Yuno Gasai': { img: 'images/Yuno Gasai.jpg', anime: 'Future Diary' },
+
+  // ---- Solo Leveling ----
+  'Sung Jin-Woo': { img: 'images/Sung Jin Woo.jpg', anime: 'Solo Leveling' },
+
+  // ---- Your Lie in April ----
+  'Kousei Arima': { img: 'images/Kōsei Arima.jpg', anime: 'Your Lie in April' },
+
+  // ---- The Apothecary Diaries ----
+  'Maomao': { img: 'images/Maomao.jpg', anime: 'The Apothecary Diaries' },
+
+  // ---- My Dress-Up Darling ----
+  'Marin Kitagawa': { img: 'images/Marin kitagawa.jpg', anime: 'My Dress-Up Darling' },
+
+  // ---- Attack on Titan (more) ----
+  'Eren Yeager': { img: 'images/eren.jpg', anime: 'Attack on Titan' },
 };

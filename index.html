@@ -1,236 +1,261 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="font-sans antialiased">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-    <meta name="theme-color" content="#060410">
+    <meta name="theme-color" content="#08060f">
     <title>Date · Marry · Kill — Anime Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="src/style.css">
 </head>
-<body>
+<body class="min-h-dvh bg-bg text-ink overflow-x-hidden">
 
     <!-- Ambient background -->
-    <div class="bg-orbs" aria-hidden="true">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+        <div class="absolute rounded-full blur-[100px] w-[600px] h-[400px] -top-[160px] -left-[80px] anim-orb-1"
+             style="background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, transparent 70%)"></div>
+        <div class="absolute rounded-full blur-[100px] w-[480px] h-[480px] -top-[80px] -right-[140px] anim-orb-2"
+             style="background: radial-gradient(circle, rgba(255,45,120,0.1) 0%, transparent 70%)"></div>
+        <div class="absolute rounded-full blur-[100px] w-[760px] h-[340px] -bottom-[80px] left-1/2 anim-orb-3"
+             style="background: radial-gradient(circle, rgba(79,110,247,0.07) 0%, transparent 70%)"></div>
     </div>
 
-    <div class="app-wrap">
+    <div class="relative z-10 max-w-[480px] min-[600px]:max-w-[640px] mx-auto min-h-dvh px-4 pt-6 pb-[calc(env(safe-area-inset-bottom,0px)+28px)] min-[600px]:px-6 min-[600px]:pt-9 min-[600px]:pb-10">
 
         <!-- ===== HOME SCREEN ===== -->
-        <div id="home">
-            <header class="home-header">
-                <div class="home-title-wrap">
-                    <h1 class="game-title">Date · Marry · Kill</h1>
-                    <p class="game-subtitle">Anime Edition</p>
-                </div>
-                <p class="home-tagline">Pick a mode and defend your choices</p>
+        <div id="home" class="anim-section-enter">
+            <header class="text-center pt-1 pb-7">
+                <h1 class="text-[clamp(1.7rem,7vw,2.5rem)] font-extrabold tracking-[-0.02em] leading-[1.15] text-ink">Date · Marry · Kill</h1>
+                <p class="text-[11px] font-bold tracking-[0.2em] uppercase text-ink-faint mt-1.5">Anime Edition</p>
+                <p class="text-sm text-ink-dim mt-3">Three games. Pick one and dive in.</p>
             </header>
 
-            <div class="mode-grid" id="modeGrid">
-                <!-- Injected by main.js -->
+            <div class="flex flex-col gap-3">
+                <button class="mode-card relative rounded-2xl p-4 bg-surface border border-white/10 cursor-pointer transition-colors duration-150 text-left flex items-center gap-3.5 active:scale-[0.98] anim-card-enter" style="animation-delay:0.02s" id="dmkStartBtn" type="button">
+                    <div class="text-3xl leading-none shrink-0">💕</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-base font-bold text-ink leading-tight">Date · Marry · Kill</div>
+                        <div class="text-xs text-ink-dim leading-snug mt-0.5">A random trio every round — defend your choices</div>
+                    </div>
+                    <div class="text-ink-faint shrink-0">→</div>
+                </button>
+                <button class="mode-card relative rounded-2xl p-4 bg-surface border border-white/10 cursor-pointer transition-colors duration-150 text-left flex items-center gap-3.5 active:scale-[0.98] anim-card-enter" style="animation-delay:0.06s" id="eyesStartBtn" type="button">
+                    <div class="text-3xl leading-none shrink-0">👁️</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-base font-bold text-ink leading-tight">Guess the Anime Characters</div>
+                        <div class="text-xs text-ink-dim leading-snug mt-0.5">Identify them by their eyes alone</div>
+                    </div>
+                    <div class="text-ink-faint shrink-0">→</div>
+                </button>
+                <button class="mode-card relative rounded-2xl p-4 bg-surface border border-white/10 cursor-pointer transition-colors duration-150 text-left flex items-center gap-3.5 active:scale-[0.98] anim-card-enter" style="animation-delay:0.1s" id="qbankStartBtn" type="button">
+                    <div class="text-3xl leading-none shrink-0">🎌</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-base font-bold text-ink leading-tight">Questions</div>
+                        <div class="text-xs text-ink-dim leading-snug mt-0.5">Comic Con 2026 discussion question bank</div>
+                    </div>
+                    <div class="text-ink-faint shrink-0">→</div>
+                </button>
             </div>
         </div>
 
         <!-- ===== GAME SCREEN ===== -->
-        <div id="game" class="hidden">
+        <div id="game" class="hidden flex flex-col gap-4 anim-section-enter">
 
-            <header class="game-header">
-                <button class="back-btn" id="backBtn">← Modes</button>
-                <div class="title-wrap">
-                    <h1 class="mode-title" id="modeTitle">—</h1>
+            <header class="text-center">
+                <button class="inline-flex items-center gap-1 min-h-9 px-3.5 bg-white/5 border border-white/10 text-ink-dim text-xs font-semibold rounded-full mb-3 transition-colors duration-150 hover:bg-white/10 hover:text-ink" id="backBtn">← Home</button>
+                <h1 class="text-lg font-bold tracking-tight text-ink mb-2.5" id="modeTitle">—</h1>
+                <div class="flex items-center justify-center gap-2.5 mb-3 flex-wrap">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/5 border border-white/10 text-ink-dim text-xs font-semibold" id="roundName">—</span>
+                    <span class="text-xs text-ink-faint font-medium" id="trioCounter">Trio 1 / 3</span>
                 </div>
-                <div class="round-meta">
-                    <span class="round-badge" id="roundName">—</span>
-                    <span class="trio-counter" id="trioCounter">Trio 1 / 3</span>
+                <div class="h-1 max-w-[160px] mx-auto bg-white/10 rounded-full overflow-hidden">
+                    <div class="progress-fill h-full rounded-full transition-[width] duration-500 ease-snap" id="progressFill" style="width:0%"></div>
                 </div>
-                <div class="progress-track">
-                    <div class="progress-fill" id="progressFill" style="width:0%"></div>
-                </div>
-                <div class="pdots" id="pdots">
-                    <span class="pdot" data-zone="date" title="Date"></span>
-                    <span class="pdot" data-zone="marry" title="Marry"></span>
-                    <span class="pdot" data-zone="kill" title="Kill"></span>
+                <div class="flex gap-2 justify-center mt-2.5" id="pdots">
+                    <span class="pdot w-2 h-2 rounded-full border-[1.5px] border-white/15 transition-colors duration-200" data-zone="date" title="Date"></span>
+                    <span class="pdot w-2 h-2 rounded-full border-[1.5px] border-white/15 transition-colors duration-200" data-zone="marry" title="Marry"></span>
+                    <span class="pdot w-2 h-2 rounded-full border-[1.5px] border-white/15 transition-colors duration-200" data-zone="kill" title="Kill"></span>
                 </div>
             </header>
 
-            <div class="hint" id="hint">
-                <span class="hint-icon">👆</span>
+            <div class="hint flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-ink-dim transition-colors duration-200" id="hint">
+                <span class="text-sm">👆</span>
                 <span>Tap a character, then tap a zone</span>
             </div>
 
-            <div class="characters" id="characters"></div>
+            <div class="grid grid-cols-3 gap-2.5" id="characters"></div>
 
-            <div class="zones">
-                <div class="zone" data-zone="date">
-                    <div class="zone-icon">💕</div>
-                    <div class="zone-label">Date</div>
+            <div class="grid grid-cols-3 gap-2.5">
+                <div class="zone relative aspect-square rounded-2xl border-2 border-dashed border-white/15 flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors duration-150 overflow-hidden" data-zone="date">
+                    <div class="zone-icon text-2xl leading-none">💕</div>
+                    <div class="text-[11px] font-bold tracking-[0.1em] uppercase text-gold">Date</div>
                 </div>
-                <div class="zone" data-zone="marry">
-                    <div class="zone-icon">💍</div>
-                    <div class="zone-label">Marry</div>
+                <div class="zone relative aspect-square rounded-2xl border-2 border-dashed border-white/15 flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors duration-150 overflow-hidden" data-zone="marry">
+                    <div class="zone-icon text-2xl leading-none">💍</div>
+                    <div class="text-[11px] font-bold tracking-[0.1em] uppercase text-green">Marry</div>
                 </div>
-                <div class="zone" data-zone="kill">
-                    <div class="zone-icon">💀</div>
-                    <div class="zone-label">Kill</div>
+                <div class="zone relative aspect-square rounded-2xl border-2 border-dashed border-white/15 flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors duration-150 overflow-hidden" data-zone="kill">
+                    <div class="zone-icon text-2xl leading-none">💀</div>
+                    <div class="text-[11px] font-bold tracking-[0.1em] uppercase text-red">Kill</div>
                 </div>
             </div>
 
-            <div class="controls">
-                <button class="btn btn-ghost" id="resetBtn">↺ Reset</button>
-                <button class="btn btn-primary" id="nextBtn" disabled>Next →</button>
+            <div class="flex gap-2.5 sticky bottom-0 left-0 right-0 px-4 pt-3.5 pb-[calc(env(safe-area-inset-bottom,0px)+14px)] -mx-4 z-50 backdrop-blur-lg"
+                 style="background: linear-gradient(to top, rgba(8,6,15,0.97) 65%, transparent)">
+                <button class="btn flex-none px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-ink-dim font-semibold text-sm transition-colors duration-150 active:scale-[0.96] hover:bg-white/10 hover:text-ink" id="resetBtn">↺ Reset</button>
+                <button class="btn flex-1 px-5 py-3 rounded-xl bg-pink text-white font-bold text-sm shadow-[0_6px_20px_rgba(255,45,120,0.25)] transition-transform duration-150 active:scale-[0.96] disabled:opacity-30 disabled:pointer-events-none" id="nextBtn" disabled>Next →</button>
             </div>
 
         </div>
 
         <!-- ===== SUMMARY SCREEN ===== -->
-        <div id="summary" class="hidden">
-            <div class="summary-header">
-                <h2 class="summary-title">Your Final Choices</h2>
-                <p class="summary-sub">🎬 Here's the verdict</p>
+        <div id="summary" class="hidden pb-8 anim-section-enter">
+            <div class="text-center pt-1 pb-7">
+                <h2 class="text-[clamp(1.6rem,6vw,2.2rem)] font-extrabold tracking-[-0.02em] leading-[1.15] text-ink">Your Final Choices</h2>
+                <p class="text-sm text-ink-dim mt-2">🎬 Here's the verdict</p>
             </div>
-            <div class="summary-tally" id="summaryTally"></div>
+            <div class="grid grid-cols-3 gap-2.5 mb-8" id="summaryTally"></div>
             <div id="summaryContent"></div>
-            <div class="summary-footer">
-                <button class="btn btn-ghost" id="playAgainBtn">↺ Play Again</button>
-                <button class="btn btn-primary btn-lg" id="homeBtn">← All Modes</button>
+            <div class="flex justify-center gap-2.5 pt-4">
+                <button class="btn flex-none px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-ink-dim font-semibold text-sm transition-colors duration-150 active:scale-[0.96] hover:bg-white/10 hover:text-ink" id="playAgainBtn">↺ Play Again</button>
+                <button class="btn flex-none px-8 py-3 rounded-xl bg-pink text-white font-bold text-sm shadow-[0_6px_20px_rgba(255,45,120,0.25)] transition-transform duration-150 active:scale-[0.96]" id="homeBtn">← Home</button>
             </div>
         </div>
 
         <!-- ===== EYES GAME SCREEN ===== -->
-        <div id="eyes-screen" class="hidden">
+        <div id="eyes-screen" class="hidden flex flex-col gap-4 anim-section-enter">
 
-            <header class="game-header">
-                <button class="back-btn" id="eyesBackBtn">← Packs</button>
-                <div class="mode-title" id="eyesTitle">—</div>
-                <div class="eyes-meta">
-                    <span class="round-badge" id="eyesPack">Pack 1</span>
-                    <span class="trio-counter" id="eyesCounter">1 / 8</span>
+            <header class="text-center">
+                <button class="inline-flex items-center gap-1 min-h-9 px-3.5 bg-white/5 border border-white/10 text-ink-dim text-xs font-semibold rounded-full mb-3 transition-colors duration-150 hover:bg-white/10 hover:text-ink" id="eyesBackBtn">← Home</button>
+                <div class="text-lg font-bold tracking-tight text-ink mb-2.5">👁️ Guess the Anime Characters</div>
+                <div class="flex items-center justify-center gap-2.5 mb-3 flex-wrap">
+                    <span class="text-xs text-ink-faint font-medium" id="eyesCounter">1 / 8</span>
                 </div>
-                <div class="progress-track">
-                    <div class="progress-fill" id="eyesProgress" style="width:0%"></div>
+                <div class="h-1 max-w-[160px] mx-auto bg-white/10 rounded-full overflow-hidden">
+                    <div class="progress-fill h-full rounded-full transition-[width] duration-500 ease-snap" id="eyesProgress" style="width:0%"></div>
                 </div>
             </header>
 
             <!-- Score tracker -->
-            <div class="eyes-score-bar">
-                <div class="score-item score-got">
-                    <span class="score-icon">✓</span>
-                    <span id="eyesGotScore">0</span>
-                    <span class="score-label">Got it</span>
+            <div class="flex items-center justify-center bg-surface border border-white/10 rounded-2xl overflow-hidden py-3">
+                <div class="flex items-center gap-1.5 px-6 flex-1 justify-center">
+                    <span class="text-sm font-bold text-green">✓</span>
+                    <span class="text-xl font-extrabold leading-none" id="eyesGotScore">0</span>
+                    <span class="text-[11px] font-semibold text-ink-faint uppercase tracking-[0.06em]">Got it</span>
                 </div>
-                <div class="eyes-score-divider"></div>
-                <div class="score-item score-missed">
-                    <span class="score-icon">✗</span>
-                    <span id="eyesMissedScore">0</span>
-                    <span class="score-label">Missed</span>
+                <div class="w-px h-8 bg-white/10 shrink-0"></div>
+                <div class="flex items-center gap-1.5 px-6 flex-1 justify-center">
+                    <span class="text-sm font-bold text-red">✗</span>
+                    <span class="text-xl font-extrabold leading-none" id="eyesMissedScore">0</span>
+                    <span class="text-[11px] font-semibold text-ink-faint uppercase tracking-[0.06em]">Missed</span>
                 </div>
             </div>
 
             <!-- The reveal card -->
-            <div class="eyes-card-wrap">
-                <div class="eyes-card" id="eyesCard">
+            <div class="flex-1 flex justify-center">
+                <div class="w-full max-w-[360px] min-[600px]:max-w-[320px] aspect-square min-[600px]:aspect-[3/4] rounded-2xl overflow-hidden relative bg-surface border border-white/10" id="eyesCard">
                     <!-- Eye image layer -->
-                    <div class="eyes-layer" id="eyesLayer">
-                        <img id="eyesImg" src="" alt="Guess the character">
-                        <div class="eyes-mystery-overlay">
-                            <span class="eyes-mystery-text">👁️ Who is this?</span>
+                    <div class="absolute inset-0" id="eyesLayer">
+                        <img class="w-full h-full object-cover" id="eyesImg" src="" alt="Guess the character">
+                        <div class="absolute inset-0 flex items-end justify-center pb-5 pointer-events-none" style="background: linear-gradient(to bottom, transparent 45%, rgba(8,6,15,0.75) 100%)">
+                            <span class="text-sm font-semibold text-white/80 bg-black/40 px-4 py-1.5 rounded-full">👁️ Who is this?</span>
                         </div>
                     </div>
                     <!-- Face reveal layer (hidden until reveal) -->
-                    <div class="face-layer hidden" id="faceLayer">
-                        <img id="faceImg" src="" alt="Revealed character">
-                        <div class="face-revealed-badge">Revealed!</div>
+                    <div class="hidden absolute inset-0 anim-reveal-face" id="faceLayer">
+                        <img class="w-full h-full object-cover" id="faceImg" src="" alt="Revealed character">
+                        <div class="absolute top-3 right-3 bg-black/55 text-green text-[11px] font-bold px-3 py-1 rounded-full">Revealed!</div>
                     </div>
                 </div>
             </div>
 
             <!-- Controls -->
-            <div class="eyes-controls">
+            <div class="flex flex-col gap-2.5 sticky bottom-0 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] -mx-4 px-4"
+                 style="background: linear-gradient(to top, rgba(8,6,15,0.98) 65%, transparent)">
                 <div id="preReveal">
-                    <button class="btn btn-primary eyes-reveal-btn" id="revealBtn">
+                    <button class="btn w-full py-3.5 rounded-xl bg-pink text-white font-bold text-sm shadow-[0_6px_20px_rgba(255,45,120,0.25)] transition-transform duration-150 active:scale-[0.96]" id="revealBtn">
                         <span>👁️ Reveal</span>
                     </button>
                 </div>
-                <div id="postReveal" class="hidden post-reveal-btns">
-                    <button class="btn btn-miss" id="missedBtn">✗ Missed it</button>
-                    <button class="btn btn-got" id="gotItBtn">✓ Got it!</button>
+                <div id="postReveal" class="hidden flex gap-2.5">
+                    <button class="btn btn-miss flex-1 px-5 py-3 rounded-xl font-bold text-sm transition-transform duration-150 active:scale-[0.96]" id="missedBtn">✗ Missed it</button>
+                    <button class="btn btn-got flex-1 px-5 py-3 rounded-xl font-bold text-sm transition-transform duration-150 active:scale-[0.96]" id="gotItBtn">✓ Got it!</button>
                 </div>
-                <p class="kbd-hint"><kbd>R</kbd> reveal · <kbd>G</kbd> got it · <kbd>M</kbd> missed</p>
+                <p class="hidden [@media(hover:hover)_and_(pointer:fine)]:block text-center text-ink-faint text-xs pt-1">
+                    <kbd class="inline-block px-1.5 py-px rounded-md bg-white/5 border border-white/10 text-[11px] text-ink-dim mx-px">R</kbd> reveal ·
+                    <kbd class="inline-block px-1.5 py-px rounded-md bg-white/5 border border-white/10 text-[11px] text-ink-dim mx-px">G</kbd> got it ·
+                    <kbd class="inline-block px-1.5 py-px rounded-md bg-white/5 border border-white/10 text-[11px] text-ink-dim mx-px">M</kbd> missed
+                </p>
             </div>
 
         </div>
 
         <!-- ===== EYES SUMMARY ===== -->
-        <div id="eyes-summary" class="hidden">
-            <div class="summary-header">
-                <div class="eyes-summary-emoji" id="eyesSummaryEmoji">🎉</div>
-                <h2 class="summary-title" id="eyesSummaryTitle">Nice Try!</h2>
-                <p class="summary-sub" id="eyesSummaryScore">You got 5 out of 8</p>
+        <div id="eyes-summary" class="hidden pt-5 pb-9 anim-section-enter">
+            <div class="text-center pt-1 pb-7">
+                <div class="anim-emoji-pop text-5xl text-center mb-3 leading-none" id="eyesSummaryEmoji">🎉</div>
+                <h2 class="text-[clamp(1.6rem,6vw,2.2rem)] font-extrabold tracking-[-0.02em] leading-[1.15] text-ink" id="eyesSummaryTitle">Nice Try!</h2>
+                <p class="text-sm text-ink-dim mt-2" id="eyesSummaryScore">You got 5 out of 8</p>
             </div>
-            <div class="eyes-score-breakdown">
-                <div class="score-breakdown-item got">
-                    <span class="breakdown-num" id="eyesFinalGot">0</span>
-                    <span class="breakdown-label">Got it ✓</span>
+            <div class="flex gap-3 my-7">
+                <div class="flex-1 rounded-2xl px-4 py-5 text-center flex flex-col gap-1.5 bg-surface border border-white/10">
+                    <span class="text-4xl font-extrabold leading-none text-green" id="eyesFinalGot">0</span>
+                    <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-dim">Got it ✓</span>
                 </div>
-                <div class="score-breakdown-item missed">
-                    <span class="breakdown-num" id="eyesFinalMissed">0</span>
-                    <span class="breakdown-label">Missed ✗</span>
+                <div class="flex-1 rounded-2xl px-4 py-5 text-center flex flex-col gap-1.5 bg-surface border border-white/10">
+                    <span class="text-4xl font-extrabold leading-none text-red" id="eyesFinalMissed">0</span>
+                    <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-dim">Missed ✗</span>
                 </div>
             </div>
-            <div class="summary-footer">
-                <button class="btn btn-ghost" id="eyesPlayAgainBtn">↺ Play Again</button>
-                <button class="btn btn-primary btn-lg" id="eyesHomeBtn">← All Packs</button>
+            <div class="flex justify-center gap-2.5 pt-4">
+                <button class="btn flex-none px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-ink-dim font-semibold text-sm transition-colors duration-150 active:scale-[0.96] hover:bg-white/10 hover:text-ink" id="eyesPlayAgainBtn">↺ Play Again</button>
+                <button class="btn flex-none px-8 py-3 rounded-xl bg-pink text-white font-bold text-sm shadow-[0_6px_20px_rgba(255,45,120,0.25)] transition-transform duration-150 active:scale-[0.96]" id="eyesHomeBtn">← Home</button>
             </div>
         </div>
 
         <!-- ===== QUESTION BANK SCREEN ===== -->
-        <div id="qbank" class="hidden">
+        <div id="qbank" class="hidden flex flex-col gap-3.5 pb-10 anim-section-enter">
 
-            <header class="game-header">
-                <div class="qbank-nav-row">
-                    <button class="back-btn" id="qbankBackBtn">← Home</button>
-                    <button class="qbank-data-btn" id="qbankViewJson">📊 View Data</button>
+            <header class="text-center">
+                <div class="flex items-center justify-between mb-3">
+                    <button class="inline-flex items-center gap-1 min-h-9 px-3.5 bg-white/5 border border-white/10 text-ink-dim text-xs font-semibold rounded-full transition-colors duration-150 hover:bg-white/10 hover:text-ink" id="qbankBackBtn">← Home</button>
+                    <button class="inline-flex items-center gap-1 min-h-9 px-3.5 bg-white/5 border border-white/10 text-ink-dim text-xs font-semibold rounded-full transition-colors duration-150 hover:bg-white/10 hover:text-ink" id="qbankViewJson">📊 Data</button>
                 </div>
-                <div class="qbank-title-block">
-                    <span class="qbank-event-tag">🎌 Comic Con 2026</span>
-                    <h1 class="game-title">Question Bank</h1>
-                </div>
-                <p class="qbank-meta" id="qbankMeta"></p>
+                <span class="inline-block text-[11px] font-bold tracking-[0.16em] uppercase text-ink-faint mb-1.5">🎌 Comic Con 2026</span>
+                <h1 class="text-2xl font-extrabold tracking-tight text-ink">Question Bank</h1>
+                <p class="text-xs text-ink-faint text-center mt-1.5" id="qbankMeta"></p>
             </header>
 
             <!-- Filter tabs -->
-            <div class="qbank-filters" id="qbankFilters"></div>
+            <div class="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] qbank-filters" id="qbankFilters"></div>
 
             <!-- Question list -->
-            <div class="qbank-list" id="qbankList"></div>
+            <div class="flex flex-col gap-2" id="qbankList"></div>
 
             <!-- Add question form -->
-            <div class="qbank-form">
-                <p class="qbank-form-label">＋ Add New Question</p>
-                <textarea id="qbankInput" class="qbank-textarea" placeholder="Type your question here…" rows="2"></textarea>
-                <div class="qbank-form-footer">
-                    <select id="qbankCatSelect" class="qbank-select">
+            <div class="bg-surface-2 border border-white/10 rounded-2xl p-4">
+                <p class="text-[11px] font-bold tracking-[0.1em] uppercase text-ink-faint mb-2.5">＋ Add New Question</p>
+                <textarea id="qbankInput" class="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-ink text-sm font-sans resize-y outline-none transition-colors duration-150 min-h-[62px] focus:border-white/25 placeholder:text-ink-faint" placeholder="Type your question here…" rows="2"></textarea>
+                <div class="flex gap-2.5 mt-3 flex-wrap items-center">
+                    <select id="qbankCatSelect" class="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-ink text-sm font-sans outline-none transition-colors duration-150 focus:border-white/25">
                         <option value="General">General</option>
                         <option value="Controversial">Controversial</option>
                         <option value="Power Scaling">Power Scaling</option>
                         <option value="Industry">Industry</option>
                     </select>
-                    <label class="qbank-viral-label">
-                        <input type="checkbox" id="qbankViralCheck" class="qbank-viral-check">
-                        🔥 Viral Pick
+                    <label class="flex items-center gap-1.5 text-sm text-ink-dim select-none">
+                        <input type="checkbox" id="qbankViralCheck" class="accent-ink-dim w-[15px] h-[15px]">
+                        🔥 Viral
                     </label>
-                    <p class="qbank-ctrl-hint"><kbd>Ctrl</kbd>+<kbd>Enter</kbd></p>
-                    <button id="qbankAddBtn" class="btn btn-primary qbank-add-btn">Add →</button>
+                    <p class="hidden [@media(hover:hover)_and_(pointer:fine)]:block text-[11px] text-ink-faint"><kbd class="inline-block px-1.5 py-px rounded-md bg-white/5 border border-white/10 text-[11px] text-ink-dim mx-px">Ctrl</kbd>+<kbd class="inline-block px-1.5 py-px rounded-md bg-white/5 border border-white/10 text-[11px] text-ink-dim mx-px">Enter</kbd></p>
+                    <button id="qbankAddBtn" class="btn ml-auto px-5 py-2 text-sm rounded-lg bg-pink text-white font-bold transition-transform duration-150 active:scale-[0.96]">Add →</button>
                 </div>
             </div>
 
             <!-- Footer category stats -->
-            <div class="qbank-footer-stats" id="qbankFooterStats"></div>
+            <div class="flex gap-3.5 flex-wrap justify-center py-1" id="qbankFooterStats"></div>
 
         </div>
 
@@ -239,22 +264,22 @@
     <script type="module" src="src/main.js"></script>
 
     <!-- ===== JSON DATA VIEWER MODAL ===== -->
-    <div id="qbankJsonModal" class="qbank-modal hidden" role="dialog" aria-modal="true" aria-label="Shot Data Viewer">
-        <div class="qbank-modal-backdrop" id="qbankModalBackdrop"></div>
-        <div class="qbank-modal-panel">
-            <div class="qbank-modal-header">
+    <div id="qbankJsonModal" class="qbank-modal hidden fixed inset-0 z-[300] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Shot Data Viewer">
+        <div class="absolute inset-0 bg-bg/85 backdrop-blur-md" id="qbankModalBackdrop"></div>
+        <div class="relative z-10 bg-surface-2 border border-white/10 rounded-2xl w-full max-w-[600px] max-h-[80vh] flex flex-col shadow-[0_20px_60px_rgba(0,0,0,0.6)] anim-section-enter">
+            <div class="flex items-start justify-between px-5 pt-5 pb-4 border-b border-white/10 gap-3 shrink-0">
                 <div>
-                    <p class="qbank-modal-sup">localStorage · qbank_shots</p>
-                    <h2 class="qbank-modal-title">Shot Data</h2>
+                    <p class="text-[11px] font-semibold tracking-[0.1em] uppercase text-ink-faint mb-1">localStorage · qbank_shots</p>
+                    <h2 class="text-lg font-bold tracking-tight">Shot Data</h2>
                 </div>
-                <div class="qbank-modal-btns">
-                    <button class="qbank-modal-action-btn" id="qbankJsonCopy">Copy JSON</button>
-                    <button class="qbank-modal-action-btn qbank-modal-danger-btn" id="qbankJsonClear">Clear All</button>
-                    <button class="qbank-modal-close" id="qbankJsonClose" aria-label="Close">✕</button>
+                <div class="flex gap-1.5 items-center shrink-0">
+                    <button class="px-3.5 py-1.5 rounded-lg font-sans text-xs font-semibold bg-white/5 border border-white/10 text-ink-dim transition-colors duration-150 hover:bg-white/10 hover:text-ink" id="qbankJsonCopy">Copy JSON</button>
+                    <button class="px-3.5 py-1.5 rounded-lg font-sans text-xs font-semibold bg-white/5 border border-white/10 text-ink-dim transition-colors duration-150 hover:bg-red/10 hover:text-red" id="qbankJsonClear">Clear All</button>
+                    <button class="w-9 h-9 rounded-lg border border-white/10 bg-transparent text-ink-dim font-sans text-sm flex items-center justify-center transition-colors duration-150 hover:bg-white/5 hover:text-ink shrink-0" id="qbankJsonClose" aria-label="Close">✕</button>
                 </div>
             </div>
-            <div class="qbank-json-summary" id="qbankJsonSummary"></div>
-            <pre id="qbankJsonPre" class="qbank-json-pre"></pre>
+            <div class="flex border-b border-white/10 shrink-0" id="qbankJsonSummary"></div>
+            <pre id="qbankJsonPre" class="qbank-json-pre overflow-y-auto px-5 py-4 font-mono text-xs leading-relaxed text-ink-dim whitespace-pre-wrap break-words m-0 flex-1 min-h-0"></pre>
         </div>
     </div>
 
