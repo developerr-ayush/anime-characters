@@ -662,8 +662,20 @@ function startTinder() {
   tinderDeck    = shuffle(Object.keys(chars)).slice(0, TINDER_ROUNDS);
   tinderIdx     = 0;
   tinderMatches = [];
+  preloadTinderDeck();
   showScreen(tinderScreenEl);
   renderTinderCard();
+}
+
+// Warm the browser's image cache for the whole deck up front — without this,
+// each swipe sets tinderImgEl.src to an image that hasn't been fetched/decoded
+// yet, so the *previous* card's pixels stay on screen for a split second while
+// the next one loads.
+function preloadTinderDeck() {
+  tinderDeck.forEach(name => {
+    const img = new Image();
+    img.src = eyesImagePaths(name).face;
+  });
 }
 
 function renderTinderCard() {
