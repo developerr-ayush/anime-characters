@@ -413,8 +413,6 @@ let eyesHintUsed   = false;
 
 const eyesCounterEl  = document.getElementById('eyesCounter');
 const eyesProgressEl = document.getElementById('eyesProgress');
-const eyesGotEl      = document.getElementById('eyesGotScore');
-const eyesMissedEl   = document.getElementById('eyesMissedScore');
 const eyesMysteryTextEl = document.getElementById('eyesMysteryText');
 const hintBtn        = document.getElementById('hintBtn');
 const eyesCardEl     = document.getElementById('eyesCard');
@@ -457,8 +455,6 @@ function renderEyesCard() {
 
   eyesCounterEl.textContent  = `${eyesIdx + 1} / ${activeEyesPairs.length}`;
   eyesProgressEl.style.width = `${(eyesIdx / activeEyesPairs.length) * 100}%`;
-  eyesGotEl.textContent      = eyesGot;
-  eyesMissedEl.textContent   = eyesMissed;
 
   // Pre-load both images
   eyesImgEl.src = pair.eye;
@@ -510,13 +506,6 @@ function scoreEyes(got) {
   logShot('eyes', pair.name, pair.name, got ? '✅ Got it' : '❌ Missed');
 
   if (got) eyesGot++; else eyesMissed++;
-
-  // Animate the changed score counter
-  const scoreEl = got ? eyesGotEl : eyesMissedEl;
-  scoreEl.textContent = got ? eyesGot : eyesMissed;
-  scoreEl.classList.remove('anim-score-pop');
-  void scoreEl.offsetWidth; // force reflow
-  scoreEl.classList.add('anim-score-pop');
 
   vibrate(got ? [10, 30, 10] : [20]);
 
