@@ -3,6 +3,30 @@
 // `chars` keys exactly: "Eye <Name>.png" and "<Name> (2).png".
 export const EYES_FOLDER = 'Anime Characters By Their Eyes Random';
 
+// ============= POKEMON BY DRAWING =============
+// Filenames are hand-uploaded and inconsistent (typos, missing "drawing"
+// suffix), so each entry is spelled out explicitly rather than derived from
+// the name — same reasoning as `chars` below.
+export const POKEMON_FOLDER = 'Pokemon by Drawing';
+
+export const pokemonList = [
+  { name: 'Ditto',      drawing: 'Ditto drawing.webp',      reveal: 'Ditto.webp' },
+  { name: 'Eevee',      drawing: 'Eevee drawing.webp',      reveal: 'Eevee.webp' },
+  { name: 'Golem',      drawing: 'Golem drawing.webp',      reveal: 'Golem.webp' },
+  { name: 'Haunter',    drawing: 'Haunter drawing.webp',    reveal: 'Haunter.webp' },
+  { name: 'Jigglypuff', drawing: 'Jigglypuff drawing.webp', reveal: 'Jigglypuff.webp' },
+  { name: 'Koffing',    drawing: 'Koffing drawing.webp',    reveal: 'Koffing.webp' },
+  { name: 'Magnemite',  drawing: 'Magnemite drawing.webp',  reveal: 'Magnemite.webp' },
+  { name: 'Oddish',     drawing: 'Oddish drawing.webp',     reveal: 'Oddish.webp' },
+  { name: 'Onix',       drawing: 'Onix drawing.webp',       reveal: 'Onix.webp' },
+  { name: 'Poliwag',    drawing: 'Poliwag drawing.webp',    reveal: 'Poliwag.webp' },
+  { name: 'Psyduck',    drawing: 'Psyduck drawing.webp',    reveal: 'Psyduck.webp' },
+  { name: 'Staryu',     drawing: 'Staryu drawing.webp',     reveal: 'Staryu.webp' },
+  { name: 'Weedle',     drawing: 'Weedle drawing.webp',     reveal: 'Weedle.webp' },
+  { name: 'Pikachu',    drawing: 'Pikachu drawing.webp',    reveal: 'Pika chu.webp' },
+  { name: 'Charmander', drawing: 'charmendar drawing.webp', reveal: 'charmander.webp' },
+];
+
 // ============= QUESTION BANK =============
 export const QBANK_CATEGORIES = ['All', 'Power Scaling', 'Best Girl/Boy', 'Ships', 'Character Debate', 'Isekai', 'Fan Culture', 'Overrated/Underrated', 'General', 'Would You Rather'];
 
