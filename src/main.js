@@ -1365,6 +1365,19 @@ async function copyShootLogJson() {
   setTimeout(() => { btn.textContent = 'Copy JSON'; }, 2200);
 }
 
+function downloadShootLogJson() {
+  const text = JSON.stringify(shootStore, null, 2);
+  const blob = new Blob([text], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `shoot-log-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 // Merges shoot sessions pasted from another device. Sessions are matched by
 // id and unioned; shots within a shared session are deduped by id — this is
 // what lets you log on your phone while filming and pull it into the laptop
@@ -1439,6 +1452,7 @@ function clearShootLog() {
 }
 
 document.getElementById('qbankJsonCopy').addEventListener('click', copyShootLogJson);
+document.getElementById('qbankJsonDownload').addEventListener('click', downloadShootLogJson);
 document.getElementById('qbankJsonClear').addEventListener('click', clearShootLog);
 document.getElementById('qbankImportBtn').addEventListener('click', mergeShootLog);
 
